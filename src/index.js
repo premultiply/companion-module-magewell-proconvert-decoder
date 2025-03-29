@@ -3,6 +3,7 @@ import { setActions } from './actions.js'
 import { setFeedbacks } from './feedbacks.js'
 import { setPresets } from './presets.js'
 import { setVariables, checkVariables } from './variables.js'
+import { api } from './api.js'
 import got from 'got'
 import crypto from 'crypto'
 
@@ -14,54 +15,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		super(internal)
 	}
 
-	STATUS_CODES = [
-		{ number: 0, status: 'MW_STATUS_SUCCESS' },
-		{ number: 1, status: 'MW_STATUS_PENDING' },
-		{ number: 2, status: 'MW_STATUS_TIMEOUT' },
-		{ number: 3, status: 'MW_STATUS_INTERRUPTED' },
-		{ number: 4, status: 'MW_STATUS_TRY_AGAIN' },
-		{ number: 5, status: 'MW_STATUS_NOT_IMPLEMENT' },
-		{ number: 6, status: 'MW_STATUS_UNKNOWN_ERROR' },
-		{ number: 7, status: 'MW_STATUS_INVALID_ARG' },
-		{ number: 8, status: 'MW_STATUS_NO_MEMORY' },
-		{ number: 9, status: 'MW_STATUS_UNSUPPORTED' },
-		{ number: 10, status: 'MW_STATUS_FILE_BUSY' },
-		{ number: 11, status: 'MW_STATUS_DEVICE_BUSY,' },
-		{ number: 12, status: 'MW_STATUS_DEVICE_LOST' },
-		{ number: 13, status: 'MW_STATUS_IO_FAILED' },
-		{ number: 14, status: 'MW_STATUS_READ_FAILED' },
-		{ number: 15, status: 'MW_STATUS_WRITE_FAILED' },
-		{ number: 16, status: 'MW_STATUS_NOT_EXIST' },
-		{ number: 17, status: 'MW_STATUS_TOO_MANY' },
-		{ number: 18, status: 'MW_STATUS_TOO_LARGE' },
-		{ number: 19, status: 'MW_STATUS_OVERFLOW' },
-		{ number: 20, status: 'MW_STATUS_UNDERFLOW' },
-		{ number: 21, status: 'MW_STATUS_FORMAT_ERROR' },
-		{ number: 22, status: 'MW_STATUS_FILE_EXISTS' },
-		{ number: 23, status: 'MW_STATUS_FILE_TYPE_ERROR' },
-		{ number: 24, status: 'MW_STATUS_DEVICE_TYPE_ERROR' },
-		{ number: 25, status: 'MW_STATUS_IS_DIRECTORY' },
-		{ number: 26, status: 'MW_STATUS_READ_ONLY' },
-		{ number: 27, status: 'MW_STATUS_RANGE_ERROR' },
-		{ number: 28, status: 'MW_STATUS_BROKEN_PIPE' },
-		{ number: 29, status: 'MW_STATUS_NO_SPACE' },
-		{ number: 30, status: 'MW_STATUS_NOT_DIRECTORY' },
-		{ number: 31, status: 'MW_STATUS_NOT_PERMITTED' },
-		{ number: 32, status: 'MW_STATUS_BAD_ADDRESS' },
-		{ number: 33, status: 'MW_STATUS_SEEK_ERROR' },
-		{ number: 34, status: 'MW_STATUS_CROSS_DEVICE_LINK' },
-		{ number: 35, status: 'MW_STATUS_NOT_INITIALIED' },
-		{ number: 36, status: 'MW_STATUS_AUTH_FAILED' },
-		{ number: 37, status: 'MW_STATUS_NOT_LOGGED_IN' },
-		{ number: 38, status: 'MW_STATUS_WRONG_STATE' },
-		{ number: 39, status: 'MW_STATUS_MISMATCH' },
-		{ number: 40, status: 'MW_STATUS_VERIFY_FAILED' },
-		{ number: 41, status: 'MW_STATUS_CONSTRAINT_VIOLATION' },
-	]
-
-	POLLING_INTERVAL = null
-
-	STATUS = {
+	/* 	STATUS = {
 		information: '',
 		summary: {
 			name: '',
@@ -134,187 +88,190 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 			tx: '',
 			rx: '',
 		},
-	}
+	} */
 
-	CHOICES_ALPHACHANNELDISPLAYMODES = [
-		{ id: 'alpha-only', label: 'Alpha Only' },
-		{ id: 'alpha-blend-white', label: 'Alpha Blend White' },
-		{ id: 'alpha-blend-black', label: 'Alpha Blend Black' },
-		{ id: 'alpha-blend-checkerboard', label: 'Alpha Blend Checkboard' },
-	]
-
-	CHOICES_NDI_SOURCES = [{ id: -1, label: 'No NDI Sources loaded.' }]
-
-	login_timer = null
-
-	got_options = {
-		responseType: 'json',
-		timeout: { request: 1000 },
-		headers: {
-			cookie: undefined,
-		},
-	}
+	session = undefined
 
 	// Initalize module
 	async init(config) {
 		this.config = config
-		this.poll = false
 		this.updateStatus(InstanceStatus.Disconnected, 'Initializing')
 
-		this.got_options.prefixUrl = `http://` + this.config.host
-		this.got_options.timeout.request = this.config.pollingrate
-
-		this.init_login()
-
-		this.init_actions()
+		/* 		this.init_actions()
 		this.init_feedbacks()
 		this.init_variables()
 		this.init_presets()
 
-		this.checkVariables()
+		this.checkVariables() */
+
+		//this.get_state()
+		this.updateStatus(InstanceStatus.Connecting)
+		this.intervalID = setInterval(this.get_state, this.config.pollingrate, this)
 	}
 
 	// Update module after a config change
 	async configUpdated(config) {
 		this.config = config
-		this.poll = false
 		this.updateStatus(InstanceStatus.Disconnected, 'Config changed')
-
-		this.got_options.prefixUrl = `http://` + this.config.host
-		this.got_options.timeout.request = this.config.pollingrate
-
-		this.init_login()
 	}
 
-	async init_login() {
-		if (this.config.host) {
-			this.got_options.headers['cookie'] = undefined
-
-			const cmd = `mwapi?method=login&id=${this.config.username}&pass=${crypto.createHash('md5').update(this.config.password).digest('hex')}`
-			if (this.config.verbose) {
-				this.log('debug', 'Sending: GET ' + cmd)
-			}
-
-			this.updateStatus(InstanceStatus.Connecting)
-
-			try {
-				const response = await got.get(cmd, this.got_options)
-				if (response.body.status == 0) {
-					//login successful
-					this.updateStatus(InstanceStatus.Ok)
-
-					this.got_options.headers['cookie'] = response.headers['set-cookie']
-
-					this.get_state()
-
-					if (this.config.polling) {
-						this.init_polling()
-					} else {
-						this.get_state(true)
-					}
-
-					//try {
-					//	clearInterval(this.login_timer)
-					//	this.login_timer = setTimeout(this.init_login, 30 * 60 * 1000) //log back in every 30 minutes;
-					//} catch (error) {
-					//	this.log('info', 'Unable to initialize login timer. Session will time out in 30 minutes.' + error)
-					//}
-				} else {
-					this.handleErrorNumber(response.body.status)
-				}
-			} catch (err) {
-				//clearInterval(this.login_timer)
-				this.got_options.headers['cookie'] = undefined
-				this.log('error', 'Error while logging in.')
-				this.handleError(err)
-			}
+	setupSession(id) {
+		if (id !== undefined && id !== this.session) {
+			this.log('debug', 'New session: ' + id)
+			this.session = id
 		}
 	}
 
-	init_polling() {
-		if (this.config.polling) {
-			if (this.config.verbose) {
-				this.log('debug', 'Starting Polling: Every ' + this.config.pollingrate + ' ms')
-			}
-			this.poll = true
-			//this.POLLING_INTERVAL = setInterval(this.get_state, parseInt(this.config.pollingrate))
-			this.get_state()
-		} else {
-			this.poll = false
+	clearSession() {
+		if (this.session !== undefined) {
+			this.log('debug', 'Session destroyed: ' + this.session)
+			this.session = undefined
 		}
+	}
+
+	isValidSession() {
+		return session !== undefined
+	}
+
+	getLabel(values, key) {
+		return values.find((v) => v.id === key)?.label
+	}
+
+	handleHttpError(err) {
+		this.updateStatus(InstanceStatus.ConnectionFailure, String(err))
 	}
 
 	sleep(ms) {
 		return new Promise((resolve) => setTimeout(resolve, ms))
 	}
 
-	async get_state(once = false) {
-		if (this.poll || once) await this.get_summary_info()
+	login() {
+		this.log('debug', 'login()')
+		this.clearSession()
 
-		//Video
-		if (this.poll || once) await this.get_video_config()
-		if (this.poll || once) await this.get_video_mode()
+		const request =
+			`http://` +
+			this.config.host +
+			`/mwapi?method=login&id=` +
+			this.config.username +
+			`&pass=` +
+			crypto.createHash('md5').update(this.config.password).digest('hex')
 
-		//Audio
-		if (this.poll || once) await this.get_audio_config()
-
-		//Channels and NDI Sources
-		if (this.poll || once) await this.list_channels()
-		if (this.poll || once) await this.get_ndi_sources()
-		if (this.poll || once) await this.get_channel() //gets the currently selected source channel for decoding
-		if (this.poll || once) await this.get_ndi_config()
-		if (this.poll || once) await this.get_playback_config()
-
-		//Network
-		if (this.poll || once) await this.get_eth_status()
-
-		if (!once && this.poll) await this.sleep(this.config.pollingrate)
-		else return
-
-		this.get_state() // loop
+		fetch(request)
+			.then((response) => {
+				if (response.ok) {
+					session = response.headers.getSetCookie()[0]
+					data = response.json()
+					if (this.handleApiStatus(data)) {
+						this.log('debug', 'login ok')
+						this.setupSession(session)
+					}
+				}
+			})
+			.catch((error) => {
+				this.updateStatus(InstanceStatus.ConnectionFailure, String(error))
+			})
 	}
 
-	handleErrorNumber(number) {
-		let errObj = this.STATUS_CODES.find((stat) => {
-			stat.number = number
-		})
-
-		if (errObj) {
-			this.handleError(errObj.status)
-		}
+	getAPI(param, session, signal = undefined) {
+		return new Promise((resolve, reject) =>
+			fetch(`http://` + this.config.host + `/mwapi?method=` + param.method, { signal, headers: { cookie: session } })
+				.then((response) => {
+					if (response.ok) {
+						session = response.headers.getSetCookie()[0]
+						return response.json()
+					}
+				})
+				.catch((error) => {
+					reject(error)
+				})
+				.then((data) => {
+					if (this.handleApiStatus(data)) {
+						this.setupSession(session)
+						resolve(data)
+					}
+					reject(this.getLabel(api.STATUS_CODES, data.status))
+				})
+				.catch((error) => {
+					reject(error)
+				})
+		)
 	}
 
-	handleError(err) {
-		try {
-			let error = err.toString()
+	get_state(self) {
+		const params = [
+			{ method: `get-summary-info`, callback: self.get_summary_info },
+			{ method: `get-video-config`, callback: self.get_video_config },
+			{ method: `get-video-mode`, callback: self.get_video_mode },
+			{ method: `get-audio-config`, callback: self.get_audio_config },
+			{ method: `list-channels`, callback: self.list_channels },
+			{ method: `get-ndi-sources`, callback: self.get_ndi_sources },
+			{ method: `get-channel`, callback: self.get_channel },
+			{ method: `get-ndi-config`, callback: self.get_ndi_config },
+			{ method: `get-playback-config`, callback: self.get_playback_config },
+			{ method: `get-eth-status`, callback: self.get_eth_status },
+		]
 
-			if (error.indexOf('ECONNREFUSED') > -1) {
-				error = 'Connection refused. Is this the right IP address?'
-			} else if (error.indexOf('ETIMEDOUT') > -1) {
-				error = 'Connection timed out. Is the device still online?'
-			} else if (error.indexOf('ENETUNREACH') > -1) {
-				error = 'Network unreachable. Check your network settings.'
-			}
+		const controller = new AbortController()
+		const promises = params.map((param) => self.getAPI(param, self.session, controller.signal))
 
-			this.log('error', `Error: ${error}`)
-		} catch (error) {
-			//error processing the error, just print it to the log
-			this.log('error', `Error: ${error}`)
-		} finally {
-			this.updateStatus(InstanceStatus.ConnectionFailure, String(err))
-			this.STATUS.information = 'Error - See Log'
-			this.checkVariables()
-			this.poll = false
+		Promise.all(promises)
+			.then((data) => {
+				console.log(data)
+				//self.log('debug', String(data))
+			})
+			.catch((error) => {
+				// remember: only first error will occur here, any other will be discarded.
+				controller.abort() // Cancel any other pending requests
+				self.login()
+			})
+
+		/* 	this.get_summary_info(),
+
+			//Video
+			this.get_video_config(),
+			this.get_video_mode(),
+
+			//Audio
+			this.get_audio_config(),
+
+			//Channels and NDI Sources
+			this.list_channels(),
+			this.get_ndi_sources(),
+			this.get_channel(), //gets the currently selected source channel for decoding
+			this.get_ndi_config(),
+			this.get_playback_config(),
+
+			//Network
+			this.get_eth_status()
+		] */
+	}
+
+	handleApiStatus(data) {
+		switch (data.status) {
+			case api.MW_STATUS_SUCCESS:
+				this.updateStatus(InstanceStatus.Ok)
+				return true //continue
+			case api.MW_STATUS_AUTH_FAILED:
+				this.log('warn', 'Authentication failed')
+				this.updateStatus(InstanceStatus.AuthenticationFailure)
+				break
+			case api.MW_STATUS_NOT_LOGGED_IN:
+				this.log('debug', 'Login required')
+				break
+			default:
+				this.updateStatus(InstanceStatus.UnknownWarning, 'Status code: ' + this.getLabel(api.STATUS_CODES, data.status))
 		}
+
+		return false
 	}
 
 	async get_summary_info() {
 		const cmd = `mwapi?method=get-summary-info`
 		try {
 			const response = await got.get(cmd, this.got_options)
-			// Success
-			if (response.body) {
-				this.log('info', 'Response: ' + JSON.stringify(response.body))
+			if (this.handleApiStatus(response)) {
+				//this.log('info', 'Response: ' + JSON.stringify(response.body))
 				this.STATUS.summary.name = response.body.device['name']
 				this.STATUS.summary.model = response.body.device['model']
 				this.STATUS.summary.productId = response.body.device['product-id']
@@ -334,20 +291,20 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				this.STATUS.summary.ndi.name = response.body.ndi['name']
 				this.STATUS.summary.ndi.connected = response.body.ndi['connected']
 
-				this.checkVariables()
-				this.checkFeedbacks()
+				return true //successful
 			}
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
+
+		return false //not successful, abort data polling
 	}
 
 	async get_video_config() {
 		const cmd = `mwapi?method=get-video-config`
 		try {
 			const response = await got.get(cmd, this.got_options)
-			// Success
-			if (response.body) {
+			if (this.handleApiStatus(response)) {
 				//OSD
 				this.STATUS.videoConfig.showTitle = response.body['show-title']
 				this.STATUS.videoConfig.showTally = response.body['show-tally']
@@ -374,7 +331,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				this.checkFeedbacks()
 			}
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
 	}
 
@@ -382,8 +339,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		const cmd = `mwapi?method=get-video-mode`
 		try {
 			const response = await got.get(cmd, this.got_options)
-			// Success
-			if (response.body) {
+			if (this.handleApiStatus(response)) {
 				//Video Mode
 				this.STATUS.videoMode.width = response.body['width']
 				this.STATUS.videoMode.height = response.body['height']
@@ -395,7 +351,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				this.checkFeedbacks()
 			}
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
 	}
 
@@ -403,8 +359,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		const cmd = `mwapi?method=get-audio-config`
 		try {
 			const response = await got.get(cmd, this.got_options)
-			// Success
-			if (response.body) {
+			if (this.handleApiStatus(response)) {
 				this.STATUS.audioConfig.gain = response.body['gain']
 				this.STATUS.audioConfig.sampleRate = response.body['sample-rate']
 				this.STATUS.audioConfig.channels = response.body['channels']
@@ -413,7 +368,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				this.checkFeedbacks()
 			}
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
 	}
 
@@ -424,7 +379,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 			// Success
 			let old_channels = this.CHOICES_CHANNELS
 			this.CHOICES_CHANNELS = []
-			if (response.body && response.body.channels && response.body.channels.length) {
+			if (this.handleApiStatus(response) && response.body.channels && response.body.channels.length) {
 				for (let i = 0; i < response.body.channels.length; i++) {
 					let channelName = response.body.channels[i]['name']
 					let channelObj = { id: channelName, label: channelName }
@@ -436,7 +391,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				}
 			}
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
 	}
 
@@ -444,8 +399,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		const cmd = `mwapi?method=get-ndi-sources`
 		try {
 			const response = await got.get(cmd, this.got_options)
-			// Success
-			if (response.body && response.body.sources && response.body.sources.length) {
+			if (this.handleApiStatus(response) && response.body.sources && response.body.sources.length) {
 				let old_ndi_sources = this.CHOICES_NDI_SOURCES
 
 				this.CHOICES_NDI_SOURCES = []
@@ -468,7 +422,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				}
 			}
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
 	}
 
@@ -476,7 +430,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		const cmd = `mwapi?method=get-channel`
 		try {
 			const response = await got.get(cmd, this.got_options)
-			if (response.body && response.body.name) {
+			if (this.handleApiStatus(response) && response.body.name) {
 				this.STATUS.channelConfig.currentChannel = response.body.name
 				if (response.body['ndi-name'] == true) {
 					this.STATUS.channelConfig.currentChannelNDI = true
@@ -488,7 +442,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 			this.checkVariables()
 			this.checkFeedbacks()
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
 	}
 
@@ -496,8 +450,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		const cmd = `mwapi?method=get-ndi-config`
 		try {
 			const response = await got.get(cmd, this.got_options)
-			// Success
-			if (response.body) {
+			if (this.handleApiStatus(response)) {
 				this.STATUS.channelConfig.NDIEnableDiscovery = response.body['enable-discovery']
 				this.STATUS.channelConfig.NDIDiscoveryServer = response.body['discovery-server']
 				this.STATUS.channelConfig.NDISourceName = response.body['source-name']
@@ -508,7 +461,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				this.checkFeedbacks()
 			}
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
 	}
 
@@ -516,15 +469,14 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		const cmd = `mwapi?method=get-playback-config`
 		try {
 			const response = await got.get(cmd, this.got_options)
-			// Success
-			if (response.body) {
+			if (this.handleApiStatus(response)) {
 				this.STATUS.channelConfig.bufferDuration = response.body['buffer-duration']
 
 				this.checkVariables()
 				this.checkFeedbacks()
 			}
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
 	}
 
@@ -532,8 +484,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		const cmd = `mwapi?method=get-eth-status`
 		try {
 			const response = await got.get(cmd, this.got_options)
-			// Success
-			if (response.body) {
+			if (this.handleApiStatus(response)) {
 				this.STATUS.networkConfig.useDHCP = response.body['use-dhcp']
 				this.STATUS.networkConfig.deviceName = response.body['device-name']
 				this.STATUS.networkConfig.state = response.body['state']
@@ -545,7 +496,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				this.checkFeedbacks()
 			}
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
 	}
 
@@ -562,25 +513,25 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 
 		try {
 			const response = await got.get(cmd, this.got_options)
-			if (response.body && response.body.status) {
+			if (this.handleApiStatus(response)) {
 				if (this.config.verbose) {
-					this.log('debug', 'Status Code Received: ' + statusCode)
+					this.log('debug', 'Status Code Received: ' + response.body.status)
 				}
 				this.processStatusCode(response.body.status)
 			}
 		} catch (err) {
-			this.handleError(err)
+			this.handleHttpError(err)
 		}
 	}
 
 	processStatusCode(statusCode) {
 		if (statusCode == 37) {
 			//not logged in
-			this.handleError('Error: Not logged into Device. Re-initiating login.')
-			this.init_login()
+			this.handleHttpError('Error: Not logged into Device. Re-initiating login.')
+			this.login()
 		} else if (statusCode !== 0) {
 			let statusObj = this.STATUS_CODES.find(({ number }) => number === statusCode)
-			this.handleError(statusObj.status)
+			this.handleHttpError(statusObj.status)
 		}
 	}
 
@@ -672,9 +623,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 
 	// Cleanup when the module gets deleted or disabled.
 	async destroy() {
-		this.poll = false
-
-		clearInterval(this.login_timer)
+		clearInterval(this.intervalID)
 
 		this.debug('destroy')
 	}

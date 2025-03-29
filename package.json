@@ -23,7 +23,7 @@
 	"prettier": {
 		"arrowParens": "always",
 		"bracketSpacing": true,
-		"printWidth": 360,
+		"printWidth": 160,
 		"semi": false,
 		"singleQuote": true,
 		"useTabs": true,
