@@ -86,71 +86,114 @@ export const api = {
 		{ id: 40, label: 'MW_STATUS_VERIFY_FAILED' },
 		{ id: 41, label: 'MW_STATUS_CONSTRAINT_VIOLATION' },
 	],
-
-	CHOICES_ALPHACHANNELDISPLAYMODES: [
-		{ id: 'alpha-only', label: 'Alpha Only' },
-		{ id: 'alpha-blend-white', label: 'Alpha Blend White' },
-		{ id: 'alpha-blend-black', label: 'Alpha Blend Black' },
-		{ id: 'alpha-blend-checkerboard', label: 'Alpha Blend Checkboard' },
-	],
-
-	CHOICES_NDI_SOURCES: [{ id: -1, label: 'No NDI Sources loaded.' }],
 }
 
-/* data = {
-	status: 0,
+/*
+export const data1 = {
+	status: null,
 	device: {
-		name: 'Decoder1',
-		model: 'NDI to AIO',
-		'product-id': 1057,
-		'auth-type': 4,
-		'serial-no': 'Z421231205020',
-		'hw-revision': 'Z',
-		'fw-version': '1.1.998',
-		'up-to-date': true,
-		'output-state': 'connected',
-		'cpu-usage': 5.26,
-		'memory-usage': 12.43,
-		'core-temp': 31.36,
-		'board-id': 1,
-		'up-time': 24965,
-		'sd-size': 0,
+		name: null,
+		model: null,
+		productId: null,
+		authType: null,
+		serialNo: null,
+		hwRevision: null,
+		fwVersion: null,
+		upToDate: null,
+		outputState: null,
+		cpuUsage: null,
+		memoryUsage: null,
+		coreTemp: null,
+		boardId: null,
+		upTime: null,
+		sdSize: null,
 	},
 	ethernet: {
-		state: '1000m',
-		'mac-addr': 'D0:C8:57:81:D8:2A',
-		'ip-addr': '10.10.2.210',
-		'ip-mask': '255.255.255.0',
-		'gw-addr': '10.10.2.1',
-		'dns-addr': '10.10.2.1',
-		'tx-speed-kbps': 66,
-		'rx-speed-kbps': 1980,
+		state: null,
+		macAddr: null,
+		ipAddr: null,
+		ipMask: null,
+		gwAddr: null,
+		dnsAddr: null,
+		txSpeedKbps: null,
+		rxSpeedKbps: null,
 	},
 	rndis: {
-		state: 'disconnected',
-		'ip-addr': '192.168.66.1',
-		'tx-speed-kbps': 0,
-		'rx-speed-kbps': 0,
+		state: null,
+		ipAddr: null,
+		txSpeedKbps: null,
+		rxSpeedKbps: null,
 	},
 	ndi: {
-		name: 'Landtag RLP',
-		url: 'rtmp://live.disnet.ok-rlp.de/landtag/stream1?mw-buffer-duration=1000',
-		connected: true,
-		'tally-preview': false,
-		'tally-program': false,
-		'audio-drop-frames': 0,
-		'video-drop-frames': 0,
-		'video-bit-rate': 11019,
-		'audio-bit-rate': 256,
-		'audio-jitter': 136,
-		'video-jitter': 134,
-		'video-width': 1920,
-		'video-height': 1080,
-		'video-scan': 'progressive',
-		'video-field-rate': 50,
-		'audio-num-channels': 2,
-		'audio-sample-rate': 48000,
-		'audio-bit-count': 16,
+		name: null,
+		url: null,
+		connected: null,
+		tallyPreview: null,
+		tallyProgram: null,
+		audioDropFrames: null,
+		videoDropFrames: null,
+		videoBitRate: null,
+		audioBitRate: null,
+		audioJitter: null,
+		videoJitter: null,
+		videoWidth: null,
+		videoHeight: null,
+		videoScan: null,
+		videoFieldRate: null,
+		audioNumChannels: null,
+		audioSampleRate: null,
+		audioBitCount: null,
 	},
 }
+*/
+
+/*
+name
+model
+product-id
+auth-type
+serial-no
+hw-revision
+fw-version
+up-to-date
+output-state
+cpu-usage
+memory-usage
+core-temp
+board-id
+up-time
+sd-size
+
+state
+mac-addr
+ip-addr
+ip-mask
+gw-addr
+dns-addr
+tx-speed-kbps
+rx-speed-kbps
+
+state
+ip-addr
+tx-speed-kbps
+rx-speed-kbps
+
+name
+url
+connected
+tally-preview
+tally-program
+audio-drop-frames
+video-drop-frames
+video-bit-rate
+audio-bit-rate
+audio-jitter
+video-jitter
+video-width
+video-height
+video-scan
+video-field-rate
+audio-num-channels
+audio-sample-rate
+audio-bit-count
  */

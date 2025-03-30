@@ -1,81 +1,59 @@
 // ##########################
 // #### Define Variables ####
 // ##########################
-export function setVariables(self) {
+export function setVariables() {
 	const variables = []
 
-	variables.push({ variableId: 'information', name: 'Information' })
+	// Summary Info
+	variables.push({ variableId: 'device-model', name: 'Device - Model' })
+	variables.push({ variableId: 'device-product-id', name: 'Device - Product ID' })
+	variables.push({ variableId: 'device-serial-no', name: 'Device - Serial number' })
+	variables.push({ variableId: 'device-hw-revision', name: 'Device - Hardware version' })
+	variables.push({ variableId: 'device-fw-version', name: 'Device - Firmware version' })
+	variables.push({ variableId: 'device-output-state', name: 'Device - HDMI Output State' })
+	variables.push({ variableId: 'device-cpu-usage', name: 'Device - CPU Usage (%)' })
+	variables.push({ variableId: 'device-memory-usage', name: 'Device - Memory Usage (%)' })
+	variables.push({ variableId: 'device-core-temp', name: 'Device - Temperature (°C)' })
+	variables.push({ variableId: 'device-board-id', name: 'Device - Slot index' })
+	variables.push({ variableId: 'device-up-time', name: 'Device - Up time (s)' })
 
-	variables.push({ variableId: 'name', name: 'Device Name' })
-	variables.push({ variableId: 'model', name: 'Device Model' })
-	variables.push({ variableId: 'product_id', name: 'Product ID' })
-	variables.push({ variableId: 'auth_type', name: 'Auth Type' })
-	variables.push({ variableId: 'serial_number', name: 'Serial Number' })
-	variables.push({ variableId: 'hw_revision', name: 'HW Revision' })
-	variables.push({ variableId: 'fw_version', name: 'FW Version' })
-	variables.push({ variableId: 'uptodate', name: 'Up To Date' })
-	variables.push({ variableId: 'output_state', name: 'Output State' })
-	variables.push({ variableId: 'cpu_usage', name: 'CPU Usage' })
-	variables.push({ variableId: 'memory_usage', name: 'Memory Usage' })
-	variables.push({ variableId: 'core_temp', name: 'Core Temp' })
-	variables.push({ variableId: 'board_id', name: 'Board ID' })
-	variables.push({ variableId: 'up_time', name: 'UP Time' })
-	variables.push({ variableId: 'sd_size', name: 'SD Size' })
+	variables.push({ variableId: 'ethernet-state', name: 'Ethernet - Connection' })
+	variables.push({ variableId: 'ethernet-tx-speed-kbps', name: 'Ethernet - Send Speed (Kbps)' })
+	variables.push({ variableId: 'ethernet-rx-speed-kbps', name: 'Ethernet - Receive Speed (Kbps)' })
 
-	variables.push({ variableId: 'ndi_name', name: 'NDI Name' })
-	variables.push({ variableId: 'ndi_connected', name: 'NDI Connected' })
+	variables.push({ variableId: 'source-name', name: 'Source - Name' })
+	variables.push({ variableId: 'source-url', name: 'Source - URL' })
+	variables.push({ variableId: 'source-connected', name: 'Source - Connected' })
+	variables.push({ variableId: 'source-tally-preview', name: 'Source - Tally Preview' })
+	variables.push({ variableId: 'source-tally-program', name: 'Source - Tally Program' })
+	variables.push({ variableId: 'source-audio-drop-frames', name: 'Source - Audio Drop Frames' })
+	variables.push({ variableId: 'source-video-drop-frames', name: 'Source - Video Drop Frames' })
+	variables.push({ variableId: 'source-video-bit-rate', name: 'Source - Video Bit Rate (Mbps)' })
+	variables.push({ variableId: 'source-audio-bit-rate', name: 'Source - Audio Bit Rate (Kbps)' })
+	variables.push({ variableId: 'source-audio-jitter', name: 'Source - Audio Jitter (ms)' })
+	variables.push({ variableId: 'source-video-jitter', name: 'Source - Video Jitter (ms)' })
+	variables.push({ variableId: 'source-video-width', name: 'Source - Video Width' })
+	variables.push({ variableId: 'source-video-height', name: 'Source - Video Height' })
+	variables.push({ variableId: 'source-video-scan', name: 'Source - Video Scan' })
+	variables.push({ variableId: 'source-video-field-rate', name: 'Source - Video Field Rate (FPS)' })
+	variables.push({ variableId: 'source-audio-num-channels', name: 'Source - Audio Num Channels' })
+	variables.push({ variableId: 'source-audio-sample-rate', name: 'Source - Audio Sample Rate (Hz)' })
+	variables.push({ variableId: 'source-audio-bit-count', name: 'Source - Audio Bit Count' })
 
-	//Video Config - OSD
-	variables.push({ variableId: 'show_title', name: 'Show Source Name and Resolution' })
-	variables.push({ variableId: 'show_tally', name: 'Show Tally' })
-	variables.push({ variableId: 'show_vumeter', name: 'Show VU Meter' })
-	variables.push({ variableId: 'vumeter_mode', name: 'VU Meter Mode' })
-	variables.push({ variableId: 'show_center_cross', name: 'Show Center Cross' })
-	variables.push({ variableId: 'safe_area_mode', name: 'Safe Area Mode' })
-	variables.push({ variableId: 'ident_mode', name: 'Ident Mode' })
-	variables.push({ variableId: 'ident_text', name: 'Ident Text' })
+	// Video Config
+	variables.push({ variableId: 'video-show-title', name: 'Video Config - OSD - Show source name & resolution' })
+	variables.push({ variableId: 'video-show-tally', name: 'Video Config - OSD - Show tally indicators' })
+	variables.push({ variableId: 'video-show-vumeter', name: 'Video Config - OSD - Show audio meter' })
+	variables.push({ variableId: 'video-show-center-cross', name: 'Video Config - OSD - Show center cross' })
+	variables.push({ variableId: 'video-ident-mode', name: 'Video Config - OSD - Ident Mode' })
+	variables.push({ variableId: 'video-ident-text', name: 'Video Config - OSD - Ident Text' })
+	variables.push({ variableId: 'video-deinterlace-mode', name: 'Video Config - Process - Deinterlace mode' })
+	variables.push({ variableId: 'video-switch-mode', name: 'Video Config - Source - Display after source lost' })
+	variables.push({ variableId: 'video-follow-input-mode', name: 'Video Config - Resolution - Follow input' })
 
-	//Video Config - Process
-	variables.push({ variableId: 'h_flip', name: 'Horizonal Flip' })
-	variables.push({ variableId: 'v_flip', name: 'Vertical Flip' })
-	variables.push({ variableId: 'deinterlace_mode', name: 'Deinterlace Mode' })
-	variables.push({ variableId: 'ar_convert_mode', name: 'Aspect Ratio Convert Mode' })
-	variables.push({ variableId: 'alpha_disp_mode', name: 'Alpha Channel Display Mode' })
-
-	//Video Config - Source
-	variables.push({ variableId: 'auto_color_fmt', name: 'Auto Color Format' })
-	variables.push({ variableId: 'color_fmt', name: 'Color Format' })
-	variables.push({ variableId: 'switch_mode', name: 'Switch Mode' })
-
-	//Video Mode
-	variables.push({ variableId: 'width', name: 'Width' })
-	variables.push({ variableId: 'height', name: 'Height' })
-	variables.push({ variableId: 'interlaced', name: 'Interlaced' })
-	variables.push({ variableId: 'field_rate', name: 'Field Rate' })
-	variables.push({ variableId: 'aspect_ratio', name: 'Aspect Ratio' })
-
-	//Audio Config
-	variables.push({ variableId: 'audio_gain', name: 'Audio Gain' })
-	variables.push({ variableId: 'audio_samplerate', name: 'Audio Sample Rate' })
-	variables.push({ variableId: 'audio_channels', name: 'Audio Channel Mode' })
-
-	//Channels and NDI Sources
-	variables.push({ variableId: 'current_channel', name: 'Current Channel' })
-	variables.push({ variableId: 'current_channel_ndi', name: 'Current Channel is NDI' })
-	variables.push({ variableId: 'ndi_enable_discovery', name: 'NDI Discovery Enabled' })
-	variables.push({ variableId: 'ndi_discovery_server', name: 'NDI Discovery Server' })
-	//variables.push({ variableId: 'ndi_source_name', name: 'NDI Source Name' });
-	variables.push({ variableId: 'ndi_group_name', name: 'NDI Group Name' })
-	variables.push({ variableId: 'ndi_low_bandwidth', name: 'NDI Low Bandwidth' })
-	variables.push({ variableId: 'ndi_buffer_duration', name: 'Buffer Duration' })
-
-	//Network
-	variables.push({ variableId: 'network_use_dhcp', name: 'Network Use DHCP' })
-	variables.push({ variableId: 'network_device_name', name: 'Network Device Name' })
-	variables.push({ variableId: 'network_state', name: 'Network State' })
-	variables.push({ variableId: 'network_mac', name: 'Network MAC Address' })
-	variables.push({ variableId: 'network_tx', name: 'Network TX Speed Kbps' })
-	variables.push({ variableId: 'network_rx', name: 'Network RX Speed Kbps' })
+	// Audio Config
+	variables.push({ variableId: 'audio-check-pts', name: 'Audio Config - Check audio PTS' })
+	variables.push({ variableId: 'audio-gain', name: 'Audio Config - Gain (dB)' })
 
 	return variables
 }
@@ -85,77 +63,48 @@ export function setVariables(self) {
 // #########################
 export function checkVariables(self) {
 	self.setVariableValues({
-		information: self.STATUS.information,
-
-		name: self.STATUS.summary.name,
-		model: self.STATUS.summary.model,
-		product_id: self.STATUS.summary.productId,
-		auth_type: self.STATUS.summary.authType,
-		serial_number: self.STATUS.summary.serialNumber,
-		hw_revision: self.STATUS.summary.hwRevision,
-		fw_version: self.STATUS.summary.fwVersion,
-		uptodate: self.STATUS.summary.uptodate,
-		output_state: self.STATUS.summary.outputState,
-		cpu_usage: self.STATUS.summary.cpuUsage,
-		memory_usage: self.STATUS.summary.memoryUsage,
-		core_temp: self.STATUS.summary.coreTemp,
-		board_id: self.STATUS.summary.boardId,
-		up_time: self.STATUS.summary.upTime,
-		sd_size: self.STATUS.summary.sdSize,
-
-		ndi_name: self.STATUS.summary.ndi.name,
-		ndi_connected: self.STATUS.summary.ndi.connected,
-
-		//Video Config - OSD
-		show_title: self.STATUS.videoConfig.showTitle,
-		show_tally: self.STATUS.videoConfig.showTally,
-		show_vumeter: self.STATUS.videoConfig.showVUMeter,
-		vumeter_mode: self.STATUS.videoConfig.VUMeterMode,
-		show_center_cross: self.STATUS.videoConfig.showCenterCross,
-		safe_area_mode: self.STATUS.videoConfig.safeAreaMode,
-		ident_mode: self.STATUS.videoConfig.identMode,
-		ident_text: self.STATUS.videoConfig.identText,
-
-		//Video Config - Process
-		h_flip: self.STATUS.videoConfig.hFlip,
-		v_flip: self.STATUS.videoConfig.vFlip,
-		deinterlace_mode: self.STATUS.videoConfig.deinterlaceMode,
-		ar_convert_mode: self.STATUS.videoConfig.arConvertMode,
-		alpha_disp_mode: self.STATUS.videoConfig.alphaDispMode,
-
-		//Video Config - Source
-		auto_color_fmt: self.STATUS.videoConfig.autoColorFmt,
-		color_fmt: self.STATUS.videoConfig.colorFmt,
-		switch_mode: self.STATUS.videoConfig.switchMode,
-
-		//Video Mode
-		width: self.STATUS.videoMode.width,
-		height: self.STATUS.videoMode.height,
-		interlaced: self.STATUS.videoMode.interlaced,
-		field_rate: self.STATUS.videoMode.fieldRate,
-		aspect_ratio: self.STATUS.videoMode.aspectRatio,
-
-		//Audio Config
-		audio_gain: self.STATUS.audioConfig.gain,
-		audio_samplerate: self.STATUS.audioConfig.sampleRate,
-		audio_channels: self.STATUS.audioConfig.channels,
-
-		//Channels and NDI Sources
-		current_channel: self.STATUS.channelConfig.currentChannel,
-		current_channel_ndi: self.STATUS.channelConfig.currentChannelNDI,
-		ndi_enable_discovery: self.STATUS.channelConfig.NDIEnableDiscovery,
-		ndi_discovery_server: self.STATUS.channelConfig.NDIDiscoveryServer,
-		//ndi_source_name: self.STATUS.channelConfig.NDISourceName,;
-		ndi_group_name: self.STATUS.channelConfig.NDIGroupName,
-		ndi_low_bandwidth: self.STATUS.channelConfig.NDILowBandwidth,
-		ndi_buffer_duration: self.STATUS.channelConfig.bufferDuration,
-
-		//Network Config
-		network_use_dhcp: self.STATUS.networkConfig.useDHCP,
-		network_device_name: self.STATUS.networkConfig.deviceName,
-		network_state: self.STATUS.networkConfig.state,
-		network_mac: self.STATUS.networkConfig.mac,
-		network_tx: self.STATUS.networkConfig.tx,
-		network_rx: self.STATUS.networkConfig.rx,
+		'device-model': self.STATUS.summaryInfo.device.model,
+		'device-product-id': self.STATUS.summaryInfo.device.productId,
+		'device-serial-no': self.STATUS.summaryInfo.device.serialNo,
+		'device-hw-revision': self.STATUS.summaryInfo.device.hwRevision,
+		'device-fw-version': self.STATUS.summaryInfo.device.fwVersion,
+		'device-output-state': self.STATUS.summaryInfo.device.outputState,
+		'device-cpu-usage': self.STATUS.summaryInfo.device.cpuUsage,
+		'device-memory-usage': self.STATUS.summaryInfo.device.memoryUsage,
+		'device-core-temp': self.STATUS.summaryInfo.device.coreTemp,
+		'device-board-id': self.STATUS.summaryInfo.device.boardId,
+		'device-up-time': self.STATUS.summaryInfo.device.upTime,
+		'ethernet-state': self.STATUS.summaryInfo.ethernet.state,
+		'ethernet-tx-speed-kbps': self.STATUS.summaryInfo.ethernet.txSpeedKbps,
+		'ethernet-rx-speed-kbps': self.STATUS.summaryInfo.ethernet.rxSpeedKbps,
+		'source-name': self.STATUS.summaryInfo.source.name,
+		'source-url': self.STATUS.summaryInfo.source.url,
+		'source-connected': self.STATUS.summaryInfo.source.connected,
+		'source-tally-preview': self.STATUS.summaryInfo.source.tallyPreview,
+		'source-tally-program': self.STATUS.summaryInfo.source.tallyProgram,
+		'source-audio-drop-frames': self.STATUS.summaryInfo.source.audioDropFrames,
+		'source-video-drop-frames': self.STATUS.summaryInfo.source.videoDropFrames,
+		'source-video-bit-rate': self.STATUS.summaryInfo.source.videoBitRate,
+		'source-audio-bit-rate': self.STATUS.summaryInfo.source.audioBitRate,
+		'source-audio-jitter': self.STATUS.summaryInfo.source.audioJitter,
+		'source-video-jitter': self.STATUS.summaryInfo.source.videoJitter,
+		'source-video-width': self.STATUS.summaryInfo.source.videoWidth,
+		'source-video-height': self.STATUS.summaryInfo.source.videoHeight,
+		'source-video-scan': self.STATUS.summaryInfo.source.videoScan,
+		'source-video-field-rate': self.STATUS.summaryInfo.source.videoFieldRate,
+		'source-audio-num-channels': self.STATUS.summaryInfo.source.audioNumChannels,
+		'source-audio-sample-rate': self.STATUS.summaryInfo.source.audioSampleRate,
+		'source-audio-bit-count': self.STATUS.summaryInfo.source.audioBitCount,
+		'video-show-title': self.STATUS.videoConfig.showTitle,
+		'video-show-tally': self.STATUS.videoConfig.showTally,
+		'video-show-vumeter': self.STATUS.videoConfig.showVUMeter,
+		'video-show-center-cross': self.STATUS.videoConfig.showCenterCross,
+		'video-ident-mode': self.STATUS.videoConfig.identMode,
+		'video-ident-text': self.STATUS.videoConfig.identText,
+		'video-deinterlace-mode': self.STATUS.videoConfig.deinterlaceMode,
+		'video-switch-mode': self.STATUS.videoConfig.switchMode,
+		'video-follow-input-mode': self.STATUS.videoConfig.followInputMode,
+		'audio-check-pts': self.STATUS.audioConfig.checkPts,
+		'audio-gain': self.STATUS.audioConfig.gain,
 	})
 }
