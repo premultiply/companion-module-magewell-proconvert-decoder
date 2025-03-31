@@ -5,58 +5,61 @@ export function setVariables() {
 	const variables = []
 
 	// Summary Info
-	variables.push({ variableId: 'device-model', name: 'Device - Model' })
-	variables.push({ variableId: 'device-product-id', name: 'Device - Product ID' })
-	variables.push({ variableId: 'device-serial-no', name: 'Device - Serial number' })
-	variables.push({ variableId: 'device-hw-revision', name: 'Device - Hardware version' })
-	variables.push({ variableId: 'device-fw-version', name: 'Device - Firmware version' })
-	variables.push({ variableId: 'device-output-state', name: 'Device - HDMI Output State' })
-	variables.push({ variableId: 'device-cpu-usage', name: 'Device - CPU Usage (%)' })
-	variables.push({ variableId: 'device-memory-usage', name: 'Device - Memory Usage (%)' })
-	variables.push({ variableId: 'device-core-temp', name: 'Device - Temperature (°C)' })
-	variables.push({ variableId: 'device-board-id', name: 'Device - Slot index' })
-	variables.push({ variableId: 'device-up-time', name: 'Device - Up time (s)' })
+	variables.push({ variableId: 'deviceModel', name: 'Device - Model' })
+	variables.push({ variableId: 'deviceProductId', name: 'Device - Product ID' })
+	variables.push({ variableId: 'deviceSerialNo', name: 'Device - Serial number' })
+	variables.push({ variableId: 'deviceHwRevision', name: 'Device - Hardware version' })
+	variables.push({ variableId: 'deviceFwVersion', name: 'Device - Firmware version' })
+	variables.push({ variableId: 'deviceOutputState', name: 'Device - HDMI Output State' })
+	variables.push({ variableId: 'deviceCpuUsage', name: 'Device - CPU Usage (%)' })
+	variables.push({ variableId: 'deviceMemoryUsage', name: 'Device - Memory Usage (%)' })
+	variables.push({ variableId: 'deviceCoreTemp', name: 'Device - Temperature (°C)' })
+	variables.push({ variableId: 'deviceBoardId', name: 'Device - Slot index' })
+	variables.push({ variableId: 'deviceUpTime', name: 'Device - Up time (s)' })
 
-	variables.push({ variableId: 'ethernet-state', name: 'Ethernet - Connection' })
-	variables.push({ variableId: 'ethernet-tx-speed-kbps', name: 'Ethernet - Send Speed (Kbps)' })
-	variables.push({ variableId: 'ethernet-rx-speed-kbps', name: 'Ethernet - Receive Speed (Kbps)' })
+	variables.push({ variableId: 'ethernetState', name: 'Ethernet - Connection' })
+	variables.push({ variableId: 'ethernetTxSpeedKbps', name: 'Ethernet - Send Speed (Kbps)' })
+	variables.push({ variableId: 'ethernetRxSpeedKbps', name: 'Ethernet - Receive Speed (Kbps)' })
 
-	variables.push({ variableId: 'source-name', name: 'Source - Name' })
-	variables.push({ variableId: 'source-url', name: 'Source - URL' })
-	variables.push({ variableId: 'source-url-type', name: 'Source - Type' }) // Custom variable
-	variables.push({ variableId: 'source-buffer-duration', name: 'Source - Buffer Duration (ms)' }) // Custom variable
-	variables.push({ variableId: 'source-connected', name: 'Source - Connected' })
-	variables.push({ variableId: 'source-tally-preview', name: 'Source - Tally Preview' })
-	variables.push({ variableId: 'source-tally-program', name: 'Source - Tally Program' })
-	variables.push({ variableId: 'source-audio-drop-samples', name: 'Source - Audio Dropped Samples' })
-	variables.push({ variableId: 'source-video-drop-frames', name: 'Source - Video Dropped Frames' })
-	variables.push({ variableId: 'source-video-bit-rate', name: 'Source - Video Bit Rate (Mbps)' })
-	variables.push({ variableId: 'source-audio-bit-rate', name: 'Source - Audio Bit Rate (Kbps)' })
-	variables.push({ variableId: 'source-audio-jitter', name: 'Source - Audio Jitter (ms)' })
-	variables.push({ variableId: 'source-video-jitter', name: 'Source - Video Jitter (ms)' })
-	variables.push({ variableId: 'source-video-width', name: 'Source - Video Width' })
-	variables.push({ variableId: 'source-video-height', name: 'Source - Video Height' })
-	variables.push({ variableId: 'source-video-scan', name: 'Source - Video Scan Mode' })
-	variables.push({ variableId: 'source-video-scan-short', name: 'Source - Video Scan Mode (Short)' }) // Custom variable
-	variables.push({ variableId: 'source-video-field-rate', name: 'Source - Video Field Rate (FPS)' })
-	variables.push({ variableId: 'source-audio-num-channels', name: 'Source - Audio Number of Channels' })
-	variables.push({ variableId: 'source-audio-sample-rate', name: 'Source - Audio Sample Rate (Hz)' })
-	variables.push({ variableId: 'source-audio-bit-count', name: 'Source - Audio Bit Count' })
+	variables.push({ variableId: 'sourceName', name: 'Source - Name' })
+	variables.push({ variableId: 'sourceUrl', name: 'Source - URL' })
+	variables.push({ variableId: 'sourceUrlType', name: 'Source - Type' }) // Custom variable
+	variables.push({ variableId: 'sourceBufferDuration', name: 'Source - Buffer Duration (ms)' }) // Custom variable
+	variables.push({ variableId: 'sourceBufferBar', name: 'Source - Buffer Usage' }) // Custom variable
+	variables.push({ variableId: 'sourceConnected', name: 'Source - Connected' })
+	variables.push({ variableId: 'sourceTallyPreview', name: 'Source - Tally Preview' })
+	variables.push({ variableId: 'sourceTallyProgram', name: 'Source - Tally Program' })
+	variables.push({ variableId: 'sourceAudioDropSamples', name: 'Source - Audio Dropped Samples' })
+	variables.push({ variableId: 'sourceVideoDropFrames', name: 'Source - Video Dropped Frames' })
+	variables.push({ variableId: 'sourceVideoBitRate', name: 'Source - Video Bit Rate (kbps)' })
+	variables.push({ variableId: 'sourceAudioBitRate', name: 'Source - Audio Bit Rate (Kbps)' })
+	variables.push({ variableId: 'sourceTotalBitrate', name: 'Source - Total Bit Rate (kbps)' }) // Custom variable
+	variables.push({ variableId: 'sourceAudioJitter', name: 'Source - Audio Jitter (ms)' })
+	variables.push({ variableId: 'sourceVideoJitter', name: 'Source - Video Jitter (ms)' })
+	variables.push({ variableId: 'sourceTotalJitter', name: 'Source - Total Jitter (ms)' }) // Custom variable
+	variables.push({ variableId: 'sourceVideoWidth', name: 'Source - Video Width' })
+	variables.push({ variableId: 'sourceVideoHeight', name: 'Source - Video Height' })
+	variables.push({ variableId: 'sourceVideoScan', name: 'Source - Video Scan Mode' })
+	variables.push({ variableId: 'sourceVideoScanShort', name: 'Source - Video Scan Mode (Short)' }) // Custom variable
+	variables.push({ variableId: 'sourceVideoFieldRate', name: 'Source - Video Field Rate (FPS)' })
+	variables.push({ variableId: 'sourceAudioNumChannels', name: 'Source - Audio Number of Channels' })
+	variables.push({ variableId: 'sourceAudioSampleRate', name: 'Source - Audio Sample Rate (Hz)' })
+	variables.push({ variableId: 'sourceAudioBitCount', name: 'Source - Audio Bit Count' })
 
 	// Video Config
-	variables.push({ variableId: 'video-show-title', name: 'Video Config - OSD - Show source name & resolution' })
-	variables.push({ variableId: 'video-show-tally', name: 'Video Config - OSD - Show tally indicators' })
-	variables.push({ variableId: 'video-show-vumeter', name: 'Video Config - OSD - Show audio meter' })
-	variables.push({ variableId: 'video-show-center-cross', name: 'Video Config - OSD - Show center cross' })
-	variables.push({ variableId: 'video-ident-mode', name: 'Video Config - OSD - Ident Mode' })
-	variables.push({ variableId: 'video-ident-text', name: 'Video Config - OSD - Ident Text' })
-	variables.push({ variableId: 'video-deinterlace-mode', name: 'Video Config - Process - Deinterlace mode' })
-	variables.push({ variableId: 'video-switch-mode', name: 'Video Config - Source - Display after source lost' })
-	variables.push({ variableId: 'video-follow-input-mode', name: 'Video Config - Resolution - Follow input' })
+	variables.push({ variableId: 'configVideoShowTitle', name: 'Video Config - OSD - Show source name & resolution' })
+	variables.push({ variableId: 'configVideoShowTally', name: 'Video Config - OSD - Show tally indicators' })
+	variables.push({ variableId: 'configVideoShowVumeter', name: 'Video Config - OSD - Show audio meter' })
+	variables.push({ variableId: 'configVideoShowCenterCross', name: 'Video Config - OSD - Show center cross' })
+	variables.push({ variableId: 'configVideoIdentMode', name: 'Video Config - OSD - Ident Mode' })
+	variables.push({ variableId: 'configVideoIdentText', name: 'Video Config - OSD - Ident Text' })
+	variables.push({ variableId: 'configVideoDeinterlaceMode', name: 'Video Config - Process - Deinterlace mode' })
+	variables.push({ variableId: 'configVideoSwitchMode', name: 'Video Config - Source - Display after source lost' })
+	variables.push({ variableId: 'configVideoFollowInputMode', name: 'Video Config - Resolution - Follow input' })
 
 	// Audio Config
-	variables.push({ variableId: 'audio-check-pts', name: 'Audio Config - Check audio PTS' })
-	variables.push({ variableId: 'audio-gain', name: 'Audio Config - Gain (dB)' })
+	variables.push({ variableId: 'configAudioCheckPts', name: 'Audio Config - Check audio PTS' })
+	variables.push({ variableId: 'configAudioGain', name: 'Audio Config - Gain (dB)' })
 
 	return variables
 }
@@ -65,59 +68,84 @@ export function setVariables() {
 // #### Check Variables ####
 // #########################
 export function checkVariables(self) {
+	const progressBar = (pct, width = 20, start = '', end = '') => {
+		if (pct && pct >= 0 && pct <= 100) {
+			const flr = Math.floor((pct * width) / 100)
+			return start + '|'.repeat(flr).padEnd(width, '.') + end
+		}
+		return '---'
+	}
+
+	const normalizePct = (val, low = 0, high = 100, limit = false, fractionDigits = 0) => {
+		if (limit) {
+			val = val < low ? low : val
+			val = val > high ? high : val
+		}
+		return val < low || val > high ? null : (((val - low) / (high - low)) * 100).toFixed(fractionDigits)
+	}
+
+	const getBufferDuration = (url) => {
+		const bufferDuration = url?.match(/mw-buffer-duration=(\d+)/)
+		return bufferDuration ? parseInt(bufferDuration[1]) : 0
+	}
+
+	const buffer = getBufferDuration(self.STATUS.summaryInfo.source.url)
+	const jitter = Math.max(self.STATUS.summaryInfo.source.audioJitter, self.STATUS.summaryInfo.source.videoJitter)
+	const bitrate = self.STATUS.summaryInfo.source.videoBitRate + self.STATUS.summaryInfo.source.audioBitRate
+
 	self.setVariableValues({
-		'device-model': self.STATUS.summaryInfo.device.model,
-		'device-product-id': self.STATUS.summaryInfo.device.productId,
-		'device-serial-no': self.STATUS.summaryInfo.device.serialNo,
-		'device-hw-revision': self.STATUS.summaryInfo.device.hwRevision,
-		'device-fw-version': self.STATUS.summaryInfo.device.fwVersion,
-		'device-output-state': self.STATUS.summaryInfo.device.outputState,
-		'device-cpu-usage': self.STATUS.summaryInfo.device.cpuUsage,
-		'device-memory-usage': self.STATUS.summaryInfo.device.memoryUsage,
-		'device-core-temp': self.STATUS.summaryInfo.device.coreTemp,
-		'device-board-id': self.STATUS.summaryInfo.device.boardId,
-		'device-up-time': self.STATUS.summaryInfo.device.upTime,
-		'ethernet-state': self.STATUS.summaryInfo.ethernet.state,
-		'ethernet-tx-speed-kbps': self.STATUS.summaryInfo.ethernet.txSpeedKbps,
-		'ethernet-rx-speed-kbps': self.STATUS.summaryInfo.ethernet.rxSpeedKbps,
-		'source-name': self.STATUS.summaryInfo.source.name,
-		'source-url': self.STATUS.summaryInfo.source.url,
-		'source-connected': self.STATUS.summaryInfo.source.connected,
-		'source-tally-preview': self.STATUS.summaryInfo.source.tallyPreview,
-		'source-tally-program': self.STATUS.summaryInfo.source.tallyProgram,
-		'source-audio-drop-samples': self.STATUS.summaryInfo.source.audioDropSamples,
-		'source-video-drop-frames': self.STATUS.summaryInfo.source.videoDropFrames,
-		'source-video-bit-rate': self.STATUS.summaryInfo.source.videoBitRate,
-		'source-audio-bit-rate': self.STATUS.summaryInfo.source.audioBitRate,
-		'source-audio-jitter': self.STATUS.summaryInfo.source.audioJitter,
-		'source-video-jitter': self.STATUS.summaryInfo.source.videoJitter,
-		'source-video-width': self.STATUS.summaryInfo.source.videoWidth,
-		'source-video-height': self.STATUS.summaryInfo.source.videoHeight,
-		'source-video-scan': self.STATUS.summaryInfo.source.videoScan,
-		'source-video-field-rate': self.STATUS.summaryInfo.source.videoFieldRate,
-		'source-audio-num-channels': self.STATUS.summaryInfo.source.audioNumChannels,
-		'source-audio-sample-rate': self.STATUS.summaryInfo.source.audioSampleRate,
-		'source-audio-bit-count': self.STATUS.summaryInfo.source.audioBitCount,
-		'video-show-title': self.STATUS.videoConfig.showTitle,
-		'video-show-tally': self.STATUS.videoConfig.showTally,
-		'video-show-vumeter': self.STATUS.videoConfig.showVUMeter,
-		'video-show-center-cross': self.STATUS.videoConfig.showCenterCross,
-		'video-ident-mode': self.STATUS.videoConfig.identMode,
-		'video-ident-text': self.STATUS.videoConfig.identText,
-		'video-deinterlace-mode': self.STATUS.videoConfig.deinterlaceMode,
-		'video-switch-mode': self.STATUS.videoConfig.switchMode,
-		'video-follow-input-mode': self.STATUS.videoConfig.followInputMode,
-		'audio-check-pts': self.STATUS.audioConfig.checkPts,
-		'audio-gain': self.STATUS.audioConfig.gain,
+		deviceModel: self.STATUS.summaryInfo.device.model,
+		deviceProductId: self.STATUS.summaryInfo.device.productId,
+		deviceSerialNo: self.STATUS.summaryInfo.device.serialNo,
+		deviceHwRevision: self.STATUS.summaryInfo.device.hwRevision,
+		deviceFwVersion: self.STATUS.summaryInfo.device.fwVersion,
+		deviceOutputState: self.STATUS.summaryInfo.device.outputState,
+		deviceCpuUsage: self.STATUS.summaryInfo.device.cpuUsage?.toFixed(2),
+		deviceMemoryUsage: self.STATUS.summaryInfo.device.memoryUsage?.toFixed(2),
+		deviceCoreTemp: self.STATUS.summaryInfo.device.coreTemp?.toFixed(2),
+		deviceBoardId: self.STATUS.summaryInfo.device.boardId,
+		deviceUpTime: self.STATUS.summaryInfo.device.upTime,
+		ethernetState: self.STATUS.summaryInfo.ethernet.state,
+		ethernetTxSpeedKbps: self.STATUS.summaryInfo.ethernet.txSpeedKbps,
+		ethernetRxSpeedKbps: self.STATUS.summaryInfo.ethernet.rxSpeedKbps,
+		sourceName: self.STATUS.summaryInfo.source.name,
+		sourceUrl: self.STATUS.summaryInfo.source.url,
+		sourceConnected: self.STATUS.summaryInfo.source.connected,
+		sourceTallyPreview: self.STATUS.summaryInfo.source.tallyPreview,
+		sourceTallyProgram: self.STATUS.summaryInfo.source.tallyProgram,
+		sourceAudioDropSamples: self.STATUS.summaryInfo.source.audioDropSamples,
+		sourceVideoDropFrames: self.STATUS.summaryInfo.source.videoDropFrames,
+		sourceVideoBitRate: self.STATUS.summaryInfo.source.videoBitRate,
+		sourceAudioBitRate: self.STATUS.summaryInfo.source.audioBitRate,
+		sourceAudioJitter: self.STATUS.summaryInfo.source.audioJitter,
+		sourceVideoJitter: self.STATUS.summaryInfo.source.videoJitter,
+		sourceVideoWidth: self.STATUS.summaryInfo.source.videoWidth,
+		sourceVideoHeight: self.STATUS.summaryInfo.source.videoHeight,
+		sourceVideoScan: self.STATUS.summaryInfo.source.videoScan,
+		sourceVideoFieldRate: self.STATUS.summaryInfo.source.videoFieldRate,
+		sourceAudioNumChannels: self.STATUS.summaryInfo.source.audioNumChannels,
+		sourceAudioSampleRate: self.STATUS.summaryInfo.source.audioSampleRate,
+		sourceAudioBitCount: self.STATUS.summaryInfo.source.audioBitCount,
+		configVideoShowTitle: self.STATUS.videoConfig.showTitle,
+		configVideoShowTally: self.STATUS.videoConfig.showTally,
+		configVideoShowVumeter: self.STATUS.videoConfig.showVUMeter,
+		configVideoShowCenterCross: self.STATUS.videoConfig.showCenterCross,
+		configVideoIdentMode: self.STATUS.videoConfig.identMode,
+		configVideoIdentText: self.STATUS.videoConfig.identText,
+		configVideoDeinterlaceMode: self.STATUS.videoConfig.deinterlaceMode,
+		configVideoSwitchMode: self.STATUS.videoConfig.switchMode,
+		configVideoFollowInputMode: self.STATUS.videoConfig.followInputMode,
+		configAudioCheckPts: self.STATUS.audioConfig.checkPts,
+		configAudioGain: self.STATUS.audioConfig.gain,
 
 		// Custom variables
-		'source-url-type': (self.STATUS.summaryInfo.source.url?.split(':')[0] ?? '').toUpperCase(),
-		'source-video-scan-short': self.STATUS.summaryInfo.source.videoScan?.charAt(0) ?? ' ',
-		'source-buffer-duration': getBufferDuration(self.STATUS.summaryInfo.source.url),
-	})
-}
+		sourceUrlType: (self.STATUS.summaryInfo.source.url?.split(':')[0] ?? '').toUpperCase(),
+		sourceVideoScanShort: self.STATUS.summaryInfo.source.videoScan?.charAt(0) ?? ' ',
 
-function getBufferDuration(url) {
-	const bufferDuration = url?.match(/mw-buffer-duration=(\d+)/)
-	return bufferDuration ? parseInt(bufferDuration[1]) : 0
+		sourceBufferDuration: buffer,
+		sourceBufferBar: progressBar(normalizePct(jitter / buffer, 0, 1, true), 15),
+
+		sourceTotalBitrate: bitrate,
+		sourceTotalJitter: jitter,
+	})
 }

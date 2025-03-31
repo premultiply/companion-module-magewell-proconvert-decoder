@@ -14,8 +14,8 @@ export function setActions(self) {
 				default: false,
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'show-title=' + action.options.show)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'show-title=' + action.options.show)
 		},
 	}
 
@@ -29,8 +29,8 @@ export function setActions(self) {
 				default: false,
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'show-tally=' + action.options.show)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'show-tally=' + action.options.show)
 		},
 	}
 
@@ -44,8 +44,8 @@ export function setActions(self) {
 				default: false,
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'show-vu-meter=' + action.options.show)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'show-vu-meter=' + action.options.show)
 		},
 	}
 
@@ -65,8 +65,8 @@ export function setActions(self) {
 				],
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'vu-meter-mode=' + action.options.mode)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'vu-meter-mode=' + action.options.mode)
 		},
 	}
 
@@ -80,8 +80,8 @@ export function setActions(self) {
 				default: false,
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'show-center-cross=' + action.options.show)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'show-center-cross=' + action.options.show)
 		},
 	}
 
@@ -101,8 +101,8 @@ export function setActions(self) {
 				],
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'safe-area-mode=' + action.options.mode)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'safe-area-mode=' + action.options.mode)
 		},
 	}
 
@@ -121,8 +121,8 @@ export function setActions(self) {
 				],
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'ident-mode=' + action.options.mode)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'ident-mode=' + action.options.mode)
 		},
 	}
 
@@ -136,8 +136,8 @@ export function setActions(self) {
 				default: '',
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'ident-text=' + action.options.text)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'ident-text=' + action.options.text)
 		},
 	}
 
@@ -151,8 +151,8 @@ export function setActions(self) {
 				default: false,
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'h-flip=' + action.options.flip)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'h-flip=' + action.options.flip)
 		},
 	}
 
@@ -166,8 +166,8 @@ export function setActions(self) {
 				default: false,
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'v-flip=' + action.options.flip)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'v-flip=' + action.options.flip)
 		},
 	}
 
@@ -185,8 +185,8 @@ export function setActions(self) {
 				],
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'deinterlace-mode=' + action.options.mode)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'deinterlace-mode=' + action.options.mode)
 		},
 	}
 
@@ -205,8 +205,8 @@ export function setActions(self) {
 				],
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'ar-convert-mode=' + action.options.mode)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'ar-convert-mode=' + action.options.mode)
 		},
 	}
 
@@ -220,8 +220,8 @@ export function setActions(self) {
 				default: false,
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'in-auto-color-fmt=' + action.options.auto)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'in-auto-color-fmt=' + action.options.auto)
 		},
 	}
 
@@ -239,8 +239,8 @@ export function setActions(self) {
 				],
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'in-color-fmt=' + action.options.fmt)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'in-color-fmt=' + action.options.fmt)
 		},
 	}
 
@@ -259,13 +259,13 @@ export function setActions(self) {
 				],
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'switch-mode=' + action.options.mode)
+		callback: (action) => {
+			self.sendCommand('set-video-config', 'switch-mode=' + action.options.mode)
 		},
 	}
 
-	actions.set_audio_config = {
-		name: 'Set Audio Config',
+	actions.audioconfig_gain = {
+		name: 'Audio Config - Gain',
 		options: [
 			{
 				type: 'number',
@@ -280,13 +280,58 @@ export function setActions(self) {
 				range: true,
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-audio-config', 'gain=' + action.options.gain)
+		callback: (action) => {
+			self.sendCommand('set-audio-config', 'gain=' + action.options.gain)
+		},
+	}
+
+	actions.audioconfig_samplerate = {
+		name: 'Audio Config - Samplerate',
+		options: [
+			{
+				type: 'dropdown',
+				label: 'Sample Rate',
+				id: 'samplerate',
+				default: '48000',
+				choices: [
+					{ id: '0', label: 'Follow Input' },
+					{ id: '32000', label: '32000 Hz' },
+					{ id: '44100', label: '44100 Hz' },
+					{ id: '48000', label: '48000 Hz' },
+					{ id: '88200', label: '88200 Hz' },
+					{ id: '96000', label: '96000 Hz' },
+				],
+			},
+		],
+		callback: (action) => {
+			self.sendCommand('set-audio-config', 'samplerate=' + action.options.samplerate)
+		},
+	}
+
+	actions.audioconfig_channelcount = {
+		name: 'Audio Config - Channel count',
+		options: [
+			{
+				type: 'dropdown',
+				label: 'Channels',
+				id: 'channels',
+				default: '0',
+				choices: [
+					{ id: '0', label: 'Follow Input' },
+					{ id: '2', label: '2 Channels' },
+					{ id: '4', label: '4 Channels' },
+					{ id: '8', label: '8 Channels' },
+				],
+			},
+		],
+		callback: (action) => {
+			self.sendCommand('set-audio-config', 'channels=' + action.options.channels)
 		},
 	}
 
 	actions.select_preset_channel = {
-		name: 'Select Preset Channel to Decode',
+		name: 'Select Source Preset',
+		description: 'Select a source preset for decoding',
 		options: [
 			{
 				type: 'dropdown',
@@ -296,13 +341,15 @@ export function setActions(self) {
 				default: self.CHOICES_NDI_SOURCES[0].id,
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-channel', 'name=' + action.options.channel + '&ndi-name=false')
+		callback: (action) => {
+			const name = action.options.channel
+			self.sendCommand('set-channel', 'name=' + name + '&ndi-name=' + (name == '' ? 'true' : 'false'))
 		},
 	}
 
 	actions.select_ndi_source = {
-		name: 'Select NDI Source to Decode',
+		name: 'Select NDI Source',
+		description: 'Select an available NDI source for decoding',
 		options: [
 			{
 				type: 'dropdown',
@@ -312,8 +359,17 @@ export function setActions(self) {
 				default: self.CHOICES_NDI_SOURCES[0].id,
 			},
 		],
-		callback: async (action) => {
-			await self.sendCommand('set-channel', 'name=' + action.options.ndisource + '&ndi-name=true')
+		callback: (action) => {
+			self.sendCommand('set-channel', 'name=' + action.options.ndisource + '&ndi-name=true')
+		},
+	}
+
+	actions.reboot = {
+		name: 'Reboot',
+		description: 'Reboots the device without any further confirmation',
+		options: [],
+		callback: () => {
+			self.sendCommand('reboot')
 		},
 	}
 

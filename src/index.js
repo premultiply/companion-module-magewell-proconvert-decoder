@@ -12,18 +12,20 @@ import crypto from 'crypto'
 class MagewellProConvertDecoderInstance extends InstanceBase {
 	constructor(internal) {
 		super(internal)
+
+		this.pollID = null
 	}
 
 	// Cleanup when the module gets deleted or disabled.
 	async destroy() {
 		this.clearSession()
-		clearInterval(this.intervalID)
+		this.stopPolling()
 	}
 
 	// Initalize module
 	async init(config) {
 		this.config = config
-		this.updateStatus(InstanceStatus.Disconnected, 'Initializing')
+		//this.updateStatus(InstanceStatus.Disconnected, 'Initializing')
 
 		this.STATUS = {
 			summaryInfo: {
@@ -141,20 +143,29 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 
 		this.checkVariables()
 
-		this.updateStatus(InstanceStatus.Connecting)
-		this.intervalID = setInterval(this.get_state, this.config.pollingrate, this)
+		this.startPolling()
 	}
 
 	// Update module after a config change
 	async configUpdated(config) {
 		this.clearSession()
-		clearInterval(this.intervalID)
+		this.stopPolling()
 		this.updateStatus(InstanceStatus.Disconnected, 'Config changed')
 
 		this.config = config
 
-		this.updateStatus(InstanceStatus.Connecting)
-		this.intervalID = setInterval(this.get_state, this.config.pollingrate, this)
+		this.startPolling()
+	}
+
+	startPolling() {
+		this.pollID = setInterval(() => this.poll(), this.config.pollingrate)
+		this.log('debug', 'Polling started with ' + this.config.pollingrate + 'ms interval')
+	}
+
+	stopPolling() {
+		clearInterval(this.pollID)
+		this.pollID = null
+		this.log('debug', 'Polling stopped')
 	}
 
 	setupSession(id) {
@@ -179,58 +190,67 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		return values.find((v) => v.id === key)?.label
 	}
 
-	handleHttpError(err) {
-		this.updateStatus(InstanceStatus.ConnectionFailure, String(err))
-	}
-
-	sleep(ms) {
-		return new Promise((resolve) => setTimeout(resolve, ms))
-	}
-
 	login() {
 		this.log('debug', 'login()')
+
+		this.stopPolling()
 		this.clearSession()
-		let session = undefined
 
-		const request =
-			`http://` +
-			this.config.host +
-			`/mwapi?method=login&id=` +
-			this.config.username +
-			`&pass=` +
-			crypto.createHash('md5').update(this.config.password).digest('hex')
+		this.updateStatus(InstanceStatus.Connecting)
 
-		fetch(request)
+		let cookie = undefined
+
+		const url = `http://` + this.config.host + `/mwapi?method=login&id=` + this.config.username + `&pass=` + crypto.createHash('md5').update(this.config.password).digest('hex')
+		this.log('debug', 'GET ' + url)
+
+		const controller = new AbortController()
+		const t = setTimeout(() => controller.abort(), 10000)
+
+		const start = Date.now()
+
+		fetch(url, { signal: controller.signal })
 			.then((response) => {
 				if (response.ok) {
-					session = response.headers.getSetCookie()[0]
+					cookie = response.headers.getSetCookie()[0]
 					return response.json()
 				}
 			})
 			.then((data) => {
-				//console.log(data)
 				if (this.handleApiStatus(data)) {
-					this.log('debug', 'login ok')
-					this.setupSession(session)
+					this.log('debug', `login successful after ${Date.now() - start}ms`)
+					this.setupSession(cookie)
+					this.updateStatus(InstanceStatus.Ok)
 				}
 			})
 			.catch((error) => {
-				this.log('error', String(error))
-				this.updateStatus(InstanceStatus.ConnectionFailure, String(error))
+				this.log('error', `login failed after ${Date.now() - start}ms`)
+				if (error.name === 'AbortError') {
+					this.updateStatus(InstanceStatus.Disconnected, 'Timeout')
+				} else {
+					this.updateStatus(InstanceStatus.ConnectionFailure, String(error))
+				}
+			})
+			.finally(() => {
+				clearTimeout(t)
+				if (this.config.polling) this.startPolling()
 			})
 	}
 
 	getAPI(param, signal = undefined) {
 		return new Promise((resolve, reject) => {
 			if (!this.isValidSession()) reject('no session')
-			fetch(`http://` + this.config.host + `/mwapi?method=` + param.method, { signal, headers: { cookie: this.session } })
+
+			const url = `http://` + this.config.host + `/mwapi?method=` + param.method
+			this.log('debug', 'GET ' + url)
+
+			fetch(url, { signal, headers: { cookie: this.session } })
 				.then((response) => {
 					if (response.ok) return response.json()
 				})
 				.then((data) => {
 					//console.log(data)
 					if (this.handleApiStatus(data)) {
-						if (param.callback !== undefined) param.callback(this, data)
+						if (param.callback !== undefined) param.callback.call(this, data)
 						resolve(data)
 					}
 					reject(data)
@@ -241,168 +261,172 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		})
 	}
 
-	get_state(self) {
+	poll() {
+		this.log('debug', 'poll()')
+
+		if (!this.isValidSession()) {
+			this.login()
+			return
+		}
+
 		const params = [
-			{ method: `get-summary-info`, callback: self.get_summary_info },
-			{ method: `get-video-config`, callback: self.get_video_config },
-			{ method: `get-audio-config`, callback: self.get_audio_config },
-			{ method: `list-channels`, callback: self.list_channels },
-			{ method: `get-ndi-sources`, callback: self.get_ndi_sources },
+			{ method: `get-summary-info`, callback: this.get_summary_info },
+			{ method: `get-video-config`, callback: this.get_video_config },
+			{ method: `get-audio-config`, callback: this.get_audio_config },
+			{ method: `list-channels`, callback: this.list_channels },
+			{ method: `get-ndi-sources`, callback: this.get_ndi_sources },
 		]
 
 		const controller = new AbortController()
-		const promises = params.map((param) => self.getAPI(param, controller.signal))
-		const t = setTimeout(() => controller.abort(), self.config.pollingrate)
+		const promises = params.map((param) => this.getAPI(param, controller.signal))
+
 		const start = Date.now()
-		//console.log('----------------------------------------------------------------------------')
 
+		const t = setTimeout(() => controller.abort(), this.config.pollingrate / 2)
 		Promise.all(promises)
-			.then((data) => {
+			.then(() => {
 				// all promises fulfilled
-				//console.log(data)
+				this.log('debug', `All async API requests are resolved after ${Date.now() - start}ms`)
 
-				clearTimeout(t)
-
-				self.log('debug', `All async API requests are fulfilled after ${Date.now() - start}ms`)
-
-				self.checkVariables()
-				self.checkFeedbacks()
+				this.checkVariables()
+				this.checkFeedbacks()
 			})
 			.catch((error) => {
 				// any of the promises is rejected (fastest wins)
 				// only first error will be catched here, any other will be silently discarded!
-
-				clearTimeout(t)
 				controller.abort() // cancel any OTHER pending request
 
-				self.log('debug', `Any of the async API requests failed after ${Date.now() - start}ms`)
+				this.log('debug', `One of the async API requests is rejected with error "` + String(error) + `" after ${Date.now() - start}ms`)
 
-				// ignore abort errors
-				if (error.name !== 'AbortError') {
-					self.log('debug', String(error))
-				}
-
-				self.login()
+				this.login()
+			})
+			.finally(() => {
+				clearTimeout(t)
 			})
 	}
 
 	handleApiStatus(data) {
-		if (data.status !== undefined) {
-			switch (data.status) {
-				case api.MW_STATUS_SUCCESS:
-					this.updateStatus(InstanceStatus.Ok)
-					return true //continue
-				case api.MW_STATUS_AUTH_FAILED:
-					this.log('warn', 'Authentication failed')
-					this.updateStatus(InstanceStatus.AuthenticationFailure)
-					break
-				case api.MW_STATUS_NOT_LOGGED_IN:
-					this.log('debug', 'Login required')
-					break
-				default:
-					this.updateStatus(InstanceStatus.UnknownWarning, 'Status code: ' + this.getLabel(api.STATUS_CODES, data.status))
+		if (typeof data === 'undefined' || typeof data.status === 'undefined') {
+			this.updateStatus(InstanceStatus.UnknownError, 'Invalid API response from device')
+			return false
+		}
+
+		switch (data.status) {
+			case api.MW_STATUS_SUCCESS:
+				//this.updateStatus(InstanceStatus.Ok)
+				return true //continue
+			case api.MW_STATUS_AUTH_FAILED:
+				this.log('error', 'Authentication failed')
+				this.updateStatus(InstanceStatus.AuthenticationFailure)
+				break
+			case api.MW_STATUS_NOT_LOGGED_IN:
+				this.log('debug', 'Login required')
+				break
+			default: {
+				const statusLabel = this.getLabel(api.STATUS_CODES, data.status)
+				this.updateStatus(InstanceStatus.UnknownWarning, 'Unexpected status code: ' + statusLabel)
 			}
-		} else {
-			this.updateStatus(InstanceStatus.Disconnected)
 		}
 
 		return false
 	}
 
-	get_summary_info(self, data) {
-		self.STATUS.summaryInfo.device.name = data.device['name']
-		self.STATUS.summaryInfo.device.model = data.device['model']
-		self.STATUS.summaryInfo.device.productId = data.device['product-id']
-		self.STATUS.summaryInfo.device.serialNo = data.device['serial-no']
-		self.STATUS.summaryInfo.device.hwRevision = data.device['hw-revision']
-		self.STATUS.summaryInfo.device.fwVersion = data.device['fw-version']
-		self.STATUS.summaryInfo.device.outputState = data.device['output-state']
-		self.STATUS.summaryInfo.device.cpuUsage = data.device['cpu-usage'].toFixed(2)
-		self.STATUS.summaryInfo.device.memoryUsage = data.device['memory-usage'].toFixed(2)
-		self.STATUS.summaryInfo.device.coreTemp = data.device['core-temp'].toFixed(2)
-		self.STATUS.summaryInfo.device.boardId = data.device['board-id']
-		self.STATUS.summaryInfo.device.upTime = data.device['up-time']
+	get_summary_info(data) {
+		this.STATUS.summaryInfo.device.name = data.device['name']
+		this.STATUS.summaryInfo.device.model = data.device['model']
+		this.STATUS.summaryInfo.device.productId = data.device['product-id']
+		this.STATUS.summaryInfo.device.serialNo = data.device['serial-no']
+		this.STATUS.summaryInfo.device.hwRevision = data.device['hw-revision']
+		this.STATUS.summaryInfo.device.fwVersion = data.device['fw-version']
+		this.STATUS.summaryInfo.device.outputState = data.device['output-state']
+		this.STATUS.summaryInfo.device.cpuUsage = data.device['cpu-usage']
+		this.STATUS.summaryInfo.device.memoryUsage = data.device['memory-usage']
+		this.STATUS.summaryInfo.device.coreTemp = data.device['core-temp']
+		this.STATUS.summaryInfo.device.boardId = data.device['board-id']
+		this.STATUS.summaryInfo.device.upTime = data.device['up-time']
 
-		self.STATUS.summaryInfo.ethernet.state = data.ethernet['state']
-		self.STATUS.summaryInfo.ethernet.macAddr = data.ethernet['mac-addr']
-		self.STATUS.summaryInfo.ethernet.txSpeedKbps = data.ethernet['tx-speed-kbps']
-		self.STATUS.summaryInfo.ethernet.rxSpeedKbps = data.ethernet['rx-speed-kbps']
+		this.STATUS.summaryInfo.ethernet.state = data.ethernet['state']
+		this.STATUS.summaryInfo.ethernet.macAddr = data.ethernet['mac-addr']
+		this.STATUS.summaryInfo.ethernet.txSpeedKbps = data.ethernet['tx-speed-kbps']
+		this.STATUS.summaryInfo.ethernet.rxSpeedKbps = data.ethernet['rx-speed-kbps']
 
-		self.STATUS.summaryInfo.source.name = data.ndi['name']
-		self.STATUS.summaryInfo.source.url = data.ndi['url']
-		self.STATUS.summaryInfo.source.connected = data.ndi['connected']
-		self.STATUS.summaryInfo.source.tallyPreview = data.ndi['tally-preview']
-		self.STATUS.summaryInfo.source.tallyProgram = data.ndi['tally-program']
-		self.STATUS.summaryInfo.source.audioDropSamples = data.ndi['audio-drop-frames']
-		self.STATUS.summaryInfo.source.videoDropFrames = data.ndi['video-drop-frames']
-		self.STATUS.summaryInfo.source.videoBitRate = (data.ndi['video-bit-rate'] / 1000).toFixed(2)
-		self.STATUS.summaryInfo.source.audioBitRate = data.ndi['audio-bit-rate']
-		self.STATUS.summaryInfo.source.audioJitter = data.ndi['audio-jitter']
-		self.STATUS.summaryInfo.source.videoJitter = data.ndi['video-jitter']
-		self.STATUS.summaryInfo.source.videoWidth = data.ndi['video-width']
-		self.STATUS.summaryInfo.source.videoHeight = data.ndi['video-height']
-		self.STATUS.summaryInfo.source.videoScan = data.ndi['video-scan']
-		self.STATUS.summaryInfo.source.videoFieldRate = data.ndi['video-field-rate']
-		self.STATUS.summaryInfo.source.audioNumChannels = data.ndi['audio-num-channels']
-		self.STATUS.summaryInfo.source.audioSampleRate = data.ndi['audio-sample-rate']
-		self.STATUS.summaryInfo.source.audioBitCount = data.ndi['audio-bit-count']
+		this.STATUS.summaryInfo.source.name = data.ndi['name']
+		this.STATUS.summaryInfo.source.url = data.ndi['url']
+		this.STATUS.summaryInfo.source.connected = data.ndi['connected']
+		this.STATUS.summaryInfo.source.tallyPreview = data.ndi['tally-preview']
+		this.STATUS.summaryInfo.source.tallyProgram = data.ndi['tally-program']
+		this.STATUS.summaryInfo.source.audioDropSamples = data.ndi['audio-drop-frames']
+		this.STATUS.summaryInfo.source.videoDropFrames = data.ndi['video-drop-frames']
+		this.STATUS.summaryInfo.source.videoBitRate = data.ndi['video-bit-rate']
+		this.STATUS.summaryInfo.source.audioBitRate = data.ndi['audio-bit-rate']
+		this.STATUS.summaryInfo.source.audioJitter = data.ndi['audio-jitter']
+		this.STATUS.summaryInfo.source.videoJitter = data.ndi['video-jitter']
+		this.STATUS.summaryInfo.source.videoWidth = data.ndi['video-width']
+		this.STATUS.summaryInfo.source.videoHeight = data.ndi['video-height']
+		this.STATUS.summaryInfo.source.videoScan = data.ndi['video-scan']
+		this.STATUS.summaryInfo.source.videoFieldRate = data.ndi['video-field-rate']
+		this.STATUS.summaryInfo.source.audioNumChannels = data.ndi['audio-num-channels']
+		this.STATUS.summaryInfo.source.audioSampleRate = data.ndi['audio-sample-rate']
+		this.STATUS.summaryInfo.source.audioBitCount = data.ndi['audio-bit-count']
 	}
 
-	get_video_config(self, data) {
-		self.STATUS.videoConfig.showTitle = data['show-title']
-		self.STATUS.videoConfig.showTally = data['show-tally']
-		self.STATUS.videoConfig.showVUMeter = data['show-vu-meter']
-		self.STATUS.videoConfig.showCenterCross = data['show-center-cross']
-		self.STATUS.videoConfig.followInputMode = data['follow-input-mode']
-		self.STATUS.videoConfig.identMode = data['ident-mode']
-		self.STATUS.videoConfig.identText = data['ident-text']
-		self.STATUS.videoConfig.switchMode = data['switch-mode']
-		self.STATUS.videoConfig.deinterlaceMode = data['deinterlace-mode']
+	get_video_config(data) {
+		this.STATUS.videoConfig.showTitle = data['show-title']
+		this.STATUS.videoConfig.showTally = data['show-tally']
+		this.STATUS.videoConfig.showVUMeter = data['show-vu-meter']
+		this.STATUS.videoConfig.showCenterCross = data['show-center-cross']
+		this.STATUS.videoConfig.followInputMode = data['follow-input-mode']
+		this.STATUS.videoConfig.identMode = data['ident-mode']
+		this.STATUS.videoConfig.identText = data['ident-text']
+		this.STATUS.videoConfig.switchMode = data['switch-mode']
+		this.STATUS.videoConfig.deinterlaceMode = data['deinterlace-mode']
 	}
 
-	get_audio_config(self, data) {
-		self.STATUS.audioConfig.checkPts = data['check-pts']
-		self.STATUS.audioConfig.gain = data['gain']
+	get_audio_config(data) {
+		this.STATUS.audioConfig.checkPts = data['check-pts']
+		this.STATUS.audioConfig.gain = data['gain']
 	}
 
-	list_channels(self, data) {
+	list_channels(data) {
 		const first = [{ id: '', label: 'None' }]
 		const c = first.concat(data.channels.map((channel) => ({ id: channel['name'], label: channel['name'] })))
-		if (
-			self.CHOICES_CHANNELS.length !== c.length ||
-			!self.CHOICES_CHANNELS.every((channel, index) => channel.id === c[index].id && channel.label === c[index].label)
-		) {
-			self.CHOICES_CHANNELS = c
-			self.init_actions()
-			self.init_feedbacks()
+		if (this.CHOICES_CHANNELS.length !== c.length || !this.CHOICES_CHANNELS.every((channel, index) => channel.id === c[index].id && channel.label === c[index].label)) {
+			this.CHOICES_CHANNELS = c
+			this.init_actions()
+			this.init_feedbacks()
 		}
 	}
 
-	get_ndi_sources(self, data) {
+	get_ndi_sources(data) {
 		const first = [{ id: '', label: 'None' }]
 		const c = first.concat(data.sources.map((source) => ({ id: source['ndi-name'], label: source['ndi-name'] })))
-		if (
-			self.CHOICES_NDI_SOURCES.length !== c.length ||
-			!self.CHOICES_NDI_SOURCES.every((source, index) => source.id === c[index].id && source.label === c[index].label)
-		) {
-			self.CHOICES_NDI_SOURCES = c
-			self.init_actions()
-			self.init_feedbacks()
+		if (this.CHOICES_NDI_SOURCES.length !== c.length || !this.CHOICES_NDI_SOURCES.every((source, index) => source.id === c[index].id && source.label === c[index].label)) {
+			this.CHOICES_NDI_SOURCES = c
+			this.init_actions()
+			this.init_feedbacks()
 		}
 	}
 
-	async sendCommand(method, args) {
+	sendCommand(method, args = '') {
 		if (args !== '') {
 			args = '&' + args
 		}
 
-		const cmd = `mwapi?method=${method}${args}`
+		if (this.config.verbose) this.log('debug', 'GET mwapi?method=' + method + args)
 
-		if (this.config.verbose) {
-			this.log('debug', 'Sending: GET ' + cmd)
-		}
+		const controller = new AbortController()
+		const t = setTimeout(() => controller.abort(), this.config.pollingrate)
 
-		return this.getAPI({ method: method + args, callback: undefined })
+		this.getAPI({ method: method + args, callback: undefined }, controller.signal)
+			.then((data) => {
+				this.log('debug', 'OK ' + this.getLabel(api.STATUS_CODES, data.status))
+			})
+			.catch((error) => {
+				this.log('debug', 'FAILED ' + String(error))
+			})
+			.finally(() => {
+				clearTimeout(t)
+			})
 	}
 
 	// Return config fields for web config
@@ -501,7 +525,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 	// ############################
 	// #### Instance Feedbacks ####
 	// ############################
-	init_feedbacks(system) {
+	init_feedbacks() {
 		this.setFeedbackDefinitions(setFeedbacks(this))
 	}
 
