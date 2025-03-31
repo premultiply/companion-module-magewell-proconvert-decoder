@@ -23,8 +23,8 @@ export function setVariables() {
 
 	variables.push({ variableId: 'source-name', name: 'Source - Name' })
 	variables.push({ variableId: 'source-url', name: 'Source - URL' })
-	variables.push({ variableId: 'source-url-type', name: 'Source - Type' })
-	variables.push({ variableId: 'source-buffer-duration', name: 'Source - Buffer Duration (ms)' })
+	variables.push({ variableId: 'source-url-type', name: 'Source - Type' }) // Custom variable
+	variables.push({ variableId: 'source-buffer-duration', name: 'Source - Buffer Duration (ms)' }) // Custom variable
 	variables.push({ variableId: 'source-connected', name: 'Source - Connected' })
 	variables.push({ variableId: 'source-tally-preview', name: 'Source - Tally Preview' })
 	variables.push({ variableId: 'source-tally-program', name: 'Source - Tally Program' })
@@ -37,7 +37,7 @@ export function setVariables() {
 	variables.push({ variableId: 'source-video-width', name: 'Source - Video Width' })
 	variables.push({ variableId: 'source-video-height', name: 'Source - Video Height' })
 	variables.push({ variableId: 'source-video-scan', name: 'Source - Video Scan Mode' })
-	variables.push({ variableId: 'source-video-scan-short', name: 'Source - Video Scan Mode (Short)' })
+	variables.push({ variableId: 'source-video-scan-short', name: 'Source - Video Scan Mode (Short)' }) // Custom variable
 	variables.push({ variableId: 'source-video-field-rate', name: 'Source - Video Field Rate (FPS)' })
 	variables.push({ variableId: 'source-audio-num-channels', name: 'Source - Audio Number of Channels' })
 	variables.push({ variableId: 'source-audio-sample-rate', name: 'Source - Audio Sample Rate (Hz)' })
@@ -110,6 +110,7 @@ export function checkVariables(self) {
 		'audio-check-pts': self.STATUS.audioConfig.checkPts,
 		'audio-gain': self.STATUS.audioConfig.gain,
 
+		// Custom variables
 		'source-url-type': (self.STATUS.summaryInfo.source.url?.split(':')[0] ?? '').toUpperCase(),
 		'source-video-scan-short': self.STATUS.summaryInfo.source.videoScan?.charAt(0) ?? ' ',
 		'source-buffer-duration': getBufferDuration(self.STATUS.summaryInfo.source.url),
