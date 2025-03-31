@@ -8,11 +8,15 @@ export function setFeedbacks(self) {
 
 	const colorWhite = combineRgb(255, 255, 255)
 	const colorRed = combineRgb(255, 0, 0)
+	const colorGreen = combineRgb(0, 255, 0)
+	//const colorOrange = combineRgb(255, 102, 0)
+	//const colorBlue = combineRgb(0, 51, 204)
+	//const colorGrey = combineRgb(51, 51, 51)
 
-	feedbacks.channelSelected = {
+	feedbacks.sourcePresetSelected = {
 		type: 'boolean',
-		name: 'Show Channel is Selected On Button',
-		description: 'Indicate if Channel is currently selected for decoding',
+		name: 'Source Preset selected',
+		description: 'Indicate if the Source Preset is currently selected for decoding',
 		defaultStyle: {
 			color: colorWhite,
 			bgcolor: colorRed,
@@ -20,23 +24,20 @@ export function setFeedbacks(self) {
 		options: [
 			{
 				type: 'dropdown',
-				label: 'Channel',
-				id: 'channel',
+				label: 'Source Preset',
+				id: 'option',
+				default: self.CHOICES_CHANNELS[0].id,
 				choices: self.CHOICES_CHANNELS,
 			},
 		],
-		callback: function () {
-			if (self.STATUS.channelConfig.currentChannel.toString() == feedbacks.options.channel.toString()) {
-				return true
-			}
-
-			return false
+		callback: function (feedback) {
+			return self.STATUS.summaryInfo.source.name === feedback.options.option
 		},
 	}
 
-	feedbacks.ndiSelected = {
+	feedbacks.ndiSourceSelected = {
 		type: 'boolean',
-		name: 'Show NDI Source is Selected On Button',
+		name: 'NDI Source selected',
 		description: 'Indicate if NDI Source is currently selected for decoding',
 		defaultStyle: {
 			color: colorWhite,
@@ -46,33 +47,69 @@ export function setFeedbacks(self) {
 			{
 				type: 'dropdown',
 				label: 'NDI Source',
-				id: 'source',
+				id: 'option',
+				default: self.CHOICES_CHANNELS[0].id,
 				choices: self.CHOICES_NDI_SOURCES,
 			},
 		],
-		callback: function () {
-			if (self.STATUS.channelConfig.currentChannel.toString() == feedbacks.options.source.toString()) {
-				return true
-			}
-
-			return false
+		callback: function (feedback) {
+			return self.STATUS.summaryInfo.source.name === feedback.options.option
 		},
 	}
 
-	feedbacks.ndiConnected = {
+	feedbacks.sourceConnected = {
 		type: 'boolean',
-		name: 'NDI is Connected',
-		description: 'Indicate if selected NDI Source is Connected',
+		name: 'Source is Connected',
+		description: 'Indicate if selected Source is Connected',
 		defaultStyle: {
 			color: colorWhite,
 			bgcolor: colorRed,
 		},
+		options: [],
 		callback: function () {
-			if (self.STATUS.summary.ndi.connected) {
-				return true
-			}
+			return self.STATUS.summaryInfo.source.connected
+		},
+	}
 
-			return false
+	feedbacks.sourceDropFrames = {
+		type: 'boolean',
+		name: 'Frame drop detected',
+		description: 'Indicate if Decoder is dropping video frames or audio samples',
+		defaultStyle: {
+			color: colorWhite,
+			bgcolor: colorRed,
+		},
+		options: [],
+		callback: function () {
+			return self.STATUS.summaryInfo.source.videoDropFrames > 0 || self.STATUS.summaryInfo.source.audioDropSamples > 0
+		},
+	}
+
+	feedbacks.sourceTallyProgram = {
+		type: 'boolean',
+		name: 'Tally Program',
+		description: 'Indicates if the Program Tally is currently active',
+		defaultStyle: {
+			color: colorWhite,
+			bgcolor: colorRed,
+		},
+		options: [],
+		callback: function () {
+			return self.STATUS.summaryInfo.source.tallyProgram
+		},
+	}
+
+	feedbacks.sourceTallyPreview = {
+		type: 'boolean',
+		name: 'Tally Preview',
+		description: 'Indicates if the Preview Tally is currently active',
+		defaultStyle: {
+			color: colorWhite,
+			bgcolor: colorGreen,
+		},
+		options: [],
+		callback: function () {
+			return self.STATUS.summaryInfo.source.tallyPreview
 		},
 	}
 

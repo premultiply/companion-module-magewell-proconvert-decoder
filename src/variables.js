@@ -23,20 +23,23 @@ export function setVariables() {
 
 	variables.push({ variableId: 'source-name', name: 'Source - Name' })
 	variables.push({ variableId: 'source-url', name: 'Source - URL' })
+	variables.push({ variableId: 'source-url-type', name: 'Source - Type' })
+	variables.push({ variableId: 'source-buffer-duration', name: 'Source - Buffer Duration (ms)' })
 	variables.push({ variableId: 'source-connected', name: 'Source - Connected' })
 	variables.push({ variableId: 'source-tally-preview', name: 'Source - Tally Preview' })
 	variables.push({ variableId: 'source-tally-program', name: 'Source - Tally Program' })
-	variables.push({ variableId: 'source-audio-drop-frames', name: 'Source - Audio Drop Frames' })
-	variables.push({ variableId: 'source-video-drop-frames', name: 'Source - Video Drop Frames' })
+	variables.push({ variableId: 'source-audio-drop-samples', name: 'Source - Audio Dropped Samples' })
+	variables.push({ variableId: 'source-video-drop-frames', name: 'Source - Video Dropped Frames' })
 	variables.push({ variableId: 'source-video-bit-rate', name: 'Source - Video Bit Rate (Mbps)' })
 	variables.push({ variableId: 'source-audio-bit-rate', name: 'Source - Audio Bit Rate (Kbps)' })
 	variables.push({ variableId: 'source-audio-jitter', name: 'Source - Audio Jitter (ms)' })
 	variables.push({ variableId: 'source-video-jitter', name: 'Source - Video Jitter (ms)' })
 	variables.push({ variableId: 'source-video-width', name: 'Source - Video Width' })
 	variables.push({ variableId: 'source-video-height', name: 'Source - Video Height' })
-	variables.push({ variableId: 'source-video-scan', name: 'Source - Video Scan' })
+	variables.push({ variableId: 'source-video-scan', name: 'Source - Video Scan Mode' })
+	variables.push({ variableId: 'source-video-scan-short', name: 'Source - Video Scan Mode (Short)' })
 	variables.push({ variableId: 'source-video-field-rate', name: 'Source - Video Field Rate (FPS)' })
-	variables.push({ variableId: 'source-audio-num-channels', name: 'Source - Audio Num Channels' })
+	variables.push({ variableId: 'source-audio-num-channels', name: 'Source - Audio Number of Channels' })
 	variables.push({ variableId: 'source-audio-sample-rate', name: 'Source - Audio Sample Rate (Hz)' })
 	variables.push({ variableId: 'source-audio-bit-count', name: 'Source - Audio Bit Count' })
 
@@ -82,7 +85,7 @@ export function checkVariables(self) {
 		'source-connected': self.STATUS.summaryInfo.source.connected,
 		'source-tally-preview': self.STATUS.summaryInfo.source.tallyPreview,
 		'source-tally-program': self.STATUS.summaryInfo.source.tallyProgram,
-		'source-audio-drop-frames': self.STATUS.summaryInfo.source.audioDropFrames,
+		'source-audio-drop-samples': self.STATUS.summaryInfo.source.audioDropSamples,
 		'source-video-drop-frames': self.STATUS.summaryInfo.source.videoDropFrames,
 		'source-video-bit-rate': self.STATUS.summaryInfo.source.videoBitRate,
 		'source-audio-bit-rate': self.STATUS.summaryInfo.source.audioBitRate,
@@ -106,5 +109,14 @@ export function checkVariables(self) {
 		'video-follow-input-mode': self.STATUS.videoConfig.followInputMode,
 		'audio-check-pts': self.STATUS.audioConfig.checkPts,
 		'audio-gain': self.STATUS.audioConfig.gain,
+
+		'source-url-type': (self.STATUS.summaryInfo.source.url?.split(':')[0] ?? '').toUpperCase(),
+		'source-video-scan-short': self.STATUS.summaryInfo.source.videoScan?.charAt(0) ?? ' ',
+		'source-buffer-duration': getBufferDuration(self.STATUS.summaryInfo.source.url),
 	})
+}
+
+function getBufferDuration(url) {
+	const bufferDuration = url?.match(/mw-buffer-duration=(\d+)/)
+	return bufferDuration ? parseInt(bufferDuration[1]) : 0
 }

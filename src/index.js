@@ -4,7 +4,6 @@ import { setFeedbacks } from './feedbacks.js'
 import { setPresets } from './presets.js'
 import { setVariables, checkVariables } from './variables.js'
 import { api } from './api.js'
-import got from 'got'
 import crypto from 'crypto'
 
 // ########################
@@ -13,6 +12,18 @@ import crypto from 'crypto'
 class MagewellProConvertDecoderInstance extends InstanceBase {
 	constructor(internal) {
 		super(internal)
+	}
+
+	// Cleanup when the module gets deleted or disabled.
+	async destroy() {
+		this.clearSession()
+		clearInterval(this.intervalID)
+	}
+
+	// Initalize module
+	async init(config) {
+		this.config = config
+		this.updateStatus(InstanceStatus.Disconnected, 'Initializing')
 
 		this.STATUS = {
 			summaryInfo: {
@@ -55,7 +66,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 					connected: null,
 					tallyPreview: null,
 					tallyProgram: null,
-					audioDropFrames: null,
+					audioDropSamples: null,
 					videoDropFrames: null,
 					videoBitRate: null,
 					audioBitRate: null,
@@ -118,22 +129,10 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 			},
 		}
 
-		this.CHOICES_CHANNELS = [{ id: '', label: '[None]' }]
-		this.CHOICES_NDI_SOURCES = [{ id: '', label: '[None]' }]
+		this.CHOICES_CHANNELS = [{ id: '', label: 'None' }]
+		this.CHOICES_NDI_SOURCES = [{ id: '', label: 'None' }]
 
 		this.session = undefined
-	}
-
-	// Cleanup when the module gets deleted or disabled.
-	async destroy() {
-		this.clearSession()
-		clearInterval(this.intervalID)
-	}
-
-	// Initalize module
-	async init(config) {
-		this.config = config
-		this.updateStatus(InstanceStatus.Disconnected, 'Initializing')
 
 		this.init_variables()
 		this.init_actions()
@@ -331,7 +330,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		self.STATUS.summaryInfo.source.connected = data.ndi['connected']
 		self.STATUS.summaryInfo.source.tallyPreview = data.ndi['tally-preview']
 		self.STATUS.summaryInfo.source.tallyProgram = data.ndi['tally-program']
-		self.STATUS.summaryInfo.source.audioDropFrames = data.ndi['audio-drop-frames']
+		self.STATUS.summaryInfo.source.audioDropSamples = data.ndi['audio-drop-frames']
 		self.STATUS.summaryInfo.source.videoDropFrames = data.ndi['video-drop-frames']
 		self.STATUS.summaryInfo.source.videoBitRate = (data.ndi['video-bit-rate'] / 1000).toFixed(2)
 		self.STATUS.summaryInfo.source.audioBitRate = data.ndi['audio-bit-rate']
@@ -364,7 +363,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 	}
 
 	list_channels(self, data) {
-		const first = [{ id: '', label: '[None]' }]
+		const first = [{ id: '', label: 'None' }]
 		const c = first.concat(data.channels.map((channel) => ({ id: channel['name'], label: channel['name'] })))
 		if (
 			self.CHOICES_CHANNELS.length !== c.length ||
@@ -377,7 +376,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 	}
 
 	get_ndi_sources(self, data) {
-		const first = [{ id: '', label: '[None]' }]
+		const first = [{ id: '', label: 'None' }]
 		const c = first.concat(data.sources.map((source) => ({ id: source['ndi-name'], label: source['ndi-name'] })))
 		if (
 			self.CHOICES_NDI_SOURCES.length !== c.length ||
