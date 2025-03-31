@@ -258,28 +258,31 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 
 		Promise.all(promises)
 			.then((data) => {
-				// all successfull
+				// all promises fulfilled
 				//console.log(data)
+
+				clearTimeout(t)
+
+				self.log('debug', `All async API requests are fulfilled after ${Date.now() - start}ms`)
+
+				self.checkVariables()
+				self.checkFeedbacks()
 			})
 			.catch((error) => {
-				// any rejected
-				// remember: only first error will occur here, any other will be discarded.
-				controller.abort() // Cancel any OTHER pending request
-				// filter out abort errors
+				// any of the promises is rejected (fastest wins)
+				// only first error will be catched here, any other will be silently discarded!
+
+				clearTimeout(t)
+				controller.abort() // cancel any OTHER pending request
+
+				self.log('debug', `Any of the async API requests failed after ${Date.now() - start}ms`)
+
+				// ignore abort errors
 				if (error.name !== 'AbortError') {
 					self.log('debug', String(error))
 				}
 
 				self.login()
-			})
-			.finally(() => {
-				clearTimeout(t)
-
-				const millis = Date.now() - start
-				self.log('debug', `RTT: ${millis}ms`)
-
-				self.checkVariables()
-				self.checkFeedbacks()
 			})
 	}
 
