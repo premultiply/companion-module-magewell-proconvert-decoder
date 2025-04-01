@@ -18,5 +18,124 @@ export function setPresets(self) {
 	const colorGrey = combineRgb(51, 51, 51)
 	const colorBlack = combineRgb(0, 0, 0)
 
+	presets['dashboardSourceConnected'] = {
+		type: 'button',
+		category: 'Dashboard',
+		name: 'Source Connected',
+		style: {
+			text: '$(generic-module:sourceName)',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [],
+		feedbacks: [
+			{
+				feedbackId: 'sourceConnected',
+				style: {
+					color: colorWhite,
+					bgcolor: colorDarkGreen,
+				},
+			},
+		],
+	}
+
+	presets['systemReboot'] = {
+		type: 'button',
+		category: 'System',
+		name: 'Reboot Device (Hold 2s)',
+		style: {
+			text: 'Reboot',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		options: {
+			relativeDelay: false,
+		},
+		steps: [
+			{
+				down: [],
+				up: [],
+				2000: {
+					options: { runWhileHeld: true },
+					actions: [
+						{
+							actionId: 'reboot',
+							options: {},
+						},
+					],
+				},
+			},
+		],
+		feedbacks: [],
+	}
+
+	// #################
+	// #### Presets ####
+	// #################
+
+	self.SOURCE_PRESETS.forEach((preset, index) => {
+		presets[`presetName${index}`] = {
+			type: 'button',
+			category: 'Source Presets by Name',
+			name: `Select Source Preset "${preset.id}"`,
+			style: {
+				text: 'PRESET\\n\\n' + preset.id,
+				size: '7',
+				color: colorWhite,
+				bgcolor: colorBlack,
+			},
+			options: {
+				relativeDelay: false,
+			},
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'select_preset_name',
+							options: {
+								channel: preset.id,
+							},
+						},
+					],
+					up: [],
+				},
+			],
+			feedbacks: [],
+		}
+	})
+
+	self.SOURCE_PRESETS.forEach((preset, index) => {
+		presets[`presetIndex${index}`] = {
+			type: 'button',
+			category: 'Source Presets by Index',
+			name: `Select Source Preset #${index}`,
+			style: {
+				text: `PRESET #${index}\\n\\n$(generic-module:presetSource${index})`,
+				size: '7',
+				color: colorWhite,
+				bgcolor: colorBlack,
+			},
+			options: {
+				relativeDelay: false,
+			},
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'select_preset_index',
+							options: {
+								channel: index,
+							},
+						},
+					],
+					up: [],
+				},
+			],
+			feedbacks: [],
+		}
+	})
+
 	return presets
 }

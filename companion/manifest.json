@@ -25,10 +25,22 @@
 		"entrypoint": "..\\src\\index.js"
 	},
 	"manufacturer": "Magewell",
-	"products": [
-		"Pro Convert Decoder"
-	],
+	"products": ["Pro Convert Decoder"],
 	"keywords": [
-		"Decoder", "NDI", "HX", "SRT", "RTMP", "RTSP", "MPEG-TS", "UDP", "RTP", "HLS", "H.264", "H.265", "HEVC", "SDI", "HDMI"
+		"Decoder",
+		"NDI",
+		"HX",
+		"SRT",
+		"RTMP",
+		"RTSP",
+		"MPEG-TS",
+		"UDP",
+		"RTP",
+		"HLS",
+		"H.264",
+		"H.265",
+		"HEVC",
+		"SDI",
+		"HDMI"
 	]
 }

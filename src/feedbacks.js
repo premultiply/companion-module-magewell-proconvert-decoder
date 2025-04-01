@@ -26,8 +26,8 @@ export function setFeedbacks(self) {
 				type: 'dropdown',
 				label: 'Source Preset',
 				id: 'option',
-				default: self.CHOICES_CHANNELS[0].id,
-				choices: self.CHOICES_CHANNELS,
+				default: self.SOURCE_PRESETS[0].id,
+				choices: self.SOURCE_PRESETS,
 			},
 		],
 		callback: function (feedback) {
@@ -48,8 +48,8 @@ export function setFeedbacks(self) {
 				type: 'dropdown',
 				label: 'NDI Source',
 				id: 'option',
-				default: self.CHOICES_CHANNELS[0].id,
-				choices: self.CHOICES_NDI_SOURCES,
+				default: self.NDI_SOURCES[0].id,
+				choices: self.NDI_SOURCES,
 			},
 		],
 		callback: function (feedback) {

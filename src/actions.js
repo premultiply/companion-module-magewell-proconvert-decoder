@@ -329,21 +329,45 @@ export function setActions(self) {
 		},
 	}
 
-	actions.select_preset_channel = {
+	actions.select_preset_name = {
 		name: 'Select Source Preset',
 		description: 'Select a source preset for decoding',
 		options: [
 			{
 				type: 'dropdown',
-				label: 'Channel',
-				id: 'channel',
-				choices: self.CHOICES_CHANNELS,
-				default: self.CHOICES_NDI_SOURCES[0].id,
+				label: 'Preset Name',
+				id: 'name',
+				choices: self.SOURCE_PRESETS,
+				allowCustom: true,
 			},
 		],
 		callback: (action) => {
-			const name = action.options.channel
-			self.sendCommand('set-channel', 'name=' + name + '&ndi-name=' + (name == '' ? 'true' : 'false'))
+			self.sendCommand(
+				'set-channel',
+				'ndi-name=' + (action.options.name === '' ? 'true' : 'false') + '&name=' + action.options.name,
+			)
+		},
+	}
+
+	actions.select_preset_index = {
+		name: 'Select Source Preset by Index',
+		description: 'Select a source preset for decoding by its position in the list',
+		options: [
+			{
+				type: 'number',
+				label: 'Preset Index',
+				id: 'index',
+				required: true,
+				min: 0,
+				//max: self.SOURCE_PRESETS.length - 1,
+			},
+		],
+		callback: (action) => {
+			const name =
+				action.options.index >= 0 && action.options.index < self.SOURCE_PRESETS.length
+					? self.SOURCE_PRESETS[action.options.index].id
+					: ''
+			self.sendCommand('set-channel', 'ndi-name=' + (name === '' ? 'true' : 'false') + '&name=' + name)
 		},
 	}
 
@@ -355,12 +379,13 @@ export function setActions(self) {
 				type: 'dropdown',
 				label: 'NDI Source',
 				id: 'ndisource',
-				choices: self.CHOICES_NDI_SOURCES,
-				default: self.CHOICES_NDI_SOURCES[0].id,
+				choices: self.NDI_SOURCES,
+				//default: self.NDI_SOURCES[0].id,
+				allowCustom: true,
 			},
 		],
 		callback: (action) => {
-			self.sendCommand('set-channel', 'name=' + action.options.ndisource + '&ndi-name=true')
+			self.sendCommand('set-channel', 'ndi-name=true&name=' + action.options.ndisource)
 		},
 	}
 

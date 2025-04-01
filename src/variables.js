@@ -1,7 +1,7 @@
 // ##########################
 // #### Define Variables ####
 // ##########################
-export function setVariables() {
+export function setVariables(self) {
 	const variables = []
 
 	// Summary Info
@@ -17,9 +17,9 @@ export function setVariables() {
 	variables.push({ variableId: 'deviceBoardId', name: 'Device - Slot index' })
 	variables.push({ variableId: 'deviceUpTime', name: 'Device - Up time (s)' })
 
-	variables.push({ variableId: 'ethernetState', name: 'Ethernet - Connection' })
-	variables.push({ variableId: 'ethernetTxSpeedKbps', name: 'Ethernet - Send Speed (Kbps)' })
-	variables.push({ variableId: 'ethernetRxSpeedKbps', name: 'Ethernet - Receive Speed (Kbps)' })
+	variables.push({ variableId: 'ethernetState', name: 'Ethernet - Link State' })
+	variables.push({ variableId: 'ethernetTxSpeedKbps', name: 'Ethernet - Send Rate (Kbps)' })
+	variables.push({ variableId: 'ethernetRxSpeedKbps', name: 'Ethernet - Receive Rate (Kbps)' })
 
 	variables.push({ variableId: 'sourceName', name: 'Source - Name' })
 	variables.push({ variableId: 'sourceUrl', name: 'Source - URL' })
@@ -60,6 +60,11 @@ export function setVariables() {
 	// Audio Config
 	variables.push({ variableId: 'configAudioCheckPts', name: 'Audio Config - Check audio PTS' })
 	variables.push({ variableId: 'configAudioGain', name: 'Audio Config - Gain (dB)' })
+
+	// Source Presets
+	self.SOURCE_PRESETS.forEach((channel, index) => {
+		variables.push({ variableId: `presetSource${index}`, name: `Source Preset #${index}` })
+	})
 
 	return variables
 }
@@ -147,5 +152,9 @@ export function checkVariables(self) {
 
 		sourceTotalBitrate: bitrate,
 		sourceTotalJitter: jitter,
+
+		// Source Presets
+		...Object.fromEntries(self.SOURCE_PRESETS.map((channel, index) => [`presetSource${index}`, channel.id])),
+		//...Object.fromEntries(self.SOURCE_PRESETS.map((channel, index) => [`presetSourceURL${index}`, channel.url])),
 	})
 }

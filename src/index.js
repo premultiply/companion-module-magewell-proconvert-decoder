@@ -1,8 +1,9 @@
 import { runEntrypoint, InstanceBase, InstanceStatus } from '@companion-module/base'
+import { ConfigFields } from './config.js'
+import { setVariables, checkVariables } from './variables.js'
 import { setActions } from './actions.js'
 import { setFeedbacks } from './feedbacks.js'
 import { setPresets } from './presets.js'
-import { setVariables, checkVariables } from './variables.js'
 import { api } from './api.js'
 import crypto from 'crypto'
 
@@ -19,7 +20,8 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 	// Cleanup when the module gets deleted or disabled.
 	async destroy() {
 		this.clearSession()
-		this.stopPolling()
+		this.disablePolling()
+		this.controller.abort()
 		this.updateStatus(InstanceStatus.Disconnected)
 	}
 
@@ -131,10 +133,14 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 			},
 		}
 
-		this.CHOICES_CHANNELS = [{ id: '', label: 'None' }]
-		this.CHOICES_NDI_SOURCES = [{ id: '', label: 'None' }]
+		this.emptyList = () => {
+			return [{ id: '', label: 'None' }]
+		}
 
-		this.session = undefined
+		this.SOURCE_PRESETS = this.emptyList()
+		this.NDI_SOURCES = this.emptyList()
+
+		this.session = null
 
 		this.init_variables()
 		this.init_actions()
@@ -143,48 +149,52 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 
 		this.checkVariables()
 
-		this.startPolling()
+		this.controller = new AbortController()
+
+		this.pullData()
 	}
 
 	// Update module after a config change
 	async configUpdated(config) {
 		this.clearSession()
-		this.stopPolling()
+		this.disablePolling()
+		this.controller.abort()
 		this.updateStatus(InstanceStatus.Disconnected, 'Config changed')
 
-		this.config = config
-
-		this.startPolling()
+		this.init(config)
 	}
 
-	startPolling() {
+	enablePolling() {
 		clearInterval(this.pollID)
-		this.pollID = setInterval(() => this.poll(), this.config.pollingrate)
-		this.log('debug', 'Polling started with ' + this.config.pollingrate + 'ms interval')
+		this.pollID = setInterval(() => this.pullData(), this.config.pollingrate)
+		this.log('debug', 'Polling enabled with ' + this.config.pollingrate + 'ms interval')
 	}
 
-	stopPolling() {
+	disablePolling() {
 		clearInterval(this.pollID)
 		this.pollID = null
-		this.log('debug', 'Polling stopped')
+		this.log('debug', 'Polling disabled')
 	}
 
 	setupSession(id) {
-		if (id !== undefined && id !== this.session) {
+		if (id !== null && id !== this.session) {
 			this.log('debug', 'New session: ' + id)
 			this.session = id
 		}
 	}
 
 	clearSession() {
-		if (this.session !== undefined) {
+		if (this.session !== null) {
 			this.log('debug', 'Session destroyed: ' + this.session)
-			this.session = undefined
+			this.session = null
 		}
 	}
 
-	isValidSession() {
-		return this.session !== undefined
+	async checkSession() {
+		if (this.session === null) {
+			this.session = await this.login()
+		}
+		return this.session
 	}
 
 	getLabel(values, key) {
@@ -194,72 +204,100 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 	async login() {
 		this.log('debug', 'login()')
 
-		this.stopPolling()
+		this.disablePolling()
 		this.clearSession()
 
 		this.updateStatus(InstanceStatus.Connecting, 'Connecting to ' + this.config.host)
 
-		let cookie = undefined
+		let setCookie = undefined
 
-		const url = `http://` + this.config.host + `/mwapi?method=login&id=` + this.config.username + `&pass=` + crypto.createHash('md5').update(this.config.password).digest('hex')
+		const url =
+			`http://` +
+			this.config.host +
+			`/mwapi?method=login&id=` +
+			this.config.username +
+			`&pass=` +
+			crypto.createHash('md5').update(this.config.password).digest('hex')
 		this.log('debug', 'GET ' + url)
-
-		const c = new AbortController()
-		const t = setTimeout(() => c.abort(), 10000)
 
 		const start = Date.now()
 
 		try {
-			const response = await fetch(url, { signal: c.signal })
+			const response = await fetch(url, {
+				signal: AbortSignal.any([AbortSignal.timeout(10000), this.controller.signal]),
+			})
 			if (response.ok) {
-				cookie = response.headers.getSetCookie()[0]
+				setCookie = response.headers.getSetCookie()[0]
 				if (this.apiStatusIsSuccess(await response.json())) {
 					this.log('debug', `login successful after ${Date.now() - start}ms`)
-					this.setupSession(cookie)
+					this.setupSession(setCookie)
 					this.updateStatus(InstanceStatus.Ok, 'Connected to ' + this.config.host)
 
-					return true
+					return setCookie
 				}
 			}
 		} catch (error) {
 			this.log('error', `login attempt failed after ${Date.now() - start}ms`)
-			if (error.name === 'AbortError') {
+			if (error.name === 'TimeoutError') {
 				this.updateStatus(InstanceStatus.Disconnected, 'Timeout')
 			} else {
 				this.updateStatus(InstanceStatus.ConnectionFailure, String(error))
 			}
 		} finally {
-			clearTimeout(t)
-			this.startPolling()
+			if (this.config.polling) this.enablePolling()
 		}
 
-		return false
+		return null
 	}
 
-	async getAPI(param, signal = undefined) {
-		if (!this.isValidSession()) throw new Error('no session')
+	async sendCommand(method, args = '') {
+		this.log('debug', 'sendCommand()')
 
-		const url = `http://` + this.config.host + `/mwapi?method=` + param.method
+		const session = await this.checkSession()
+		if (session !== null) {
+			if (args !== '') args = '&' + args
+
+			this.log('debug', 'GET mwapi?method=' + method + args)
+
+			const options = {
+				signal: AbortSignal.any([AbortSignal.timeout(10000), this.controller.signal]),
+				headers: { cookie: session },
+			}
+
+			try {
+				await this.getAPI(method + args, options)
+				this.log('debug', 'OK')
+				this.updateStatus(InstanceStatus.Ok)
+			} catch (error) {
+				this.log('debug', 'FAILED ' + String(error))
+			} finally {
+				// force status update
+				if (!this.config.polling) this.pullData()
+			}
+		} else {
+			this.log('error', 'Unable to send command. No connection to device.')
+		}
+	}
+
+	async getAPI(method, options, callback = undefined) {
+		const url = `http://` + this.config.host + `/mwapi?method=` + method
 		this.log('debug', 'GET ' + url)
 
-		const response = await fetch(url, { signal, headers: { cookie: this.session } })
+		const response = await fetch(url, options)
 		if (!response.ok) throw new Error('HTTP error: ' + response.status)
 
 		const data = await response.json()
 		if (!this.apiStatusIsSuccess(data)) throw new Error('API operation was rejected')
 
-		if (param.callback !== undefined) param.callback.call(this, data)
+		if (callback !== undefined) callback.call(this, data)
 
 		return data
 	}
 
-	async poll() {
-		this.log('debug', 'poll()')
+	async pullData() {
+		this.log('debug', 'pullData()')
 
-		if (!this.isValidSession()) {
-			this.login()
-			return
-		}
+		const session = await this.checkSession()
 
 		const params = [
 			{ method: `get-summary-info`, callback: this.get_summary_info },
@@ -270,24 +308,29 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		]
 
 		const c = new AbortController()
-		const t = setTimeout(() => c.abort(), this.config.pollingrate / 2)
-		const requests = params.map((param) => this.getAPI(param, c.signal))
+		const t = AbortSignal.timeout(this.config.pollingrate - 100)
+
+		const options = {
+			signal: AbortSignal.any([t, c.signal, this.controller.signal]),
+			headers: { cookie: session },
+		}
+
+		const requests = params.map((param) => this.getAPI(param.method, options, param.callback))
 
 		const start = Date.now()
 		try {
 			await Promise.all(requests)
-			this.log('debug', `All async API requests are resolved after ${Date.now() - start}ms`)
+			this.log('debug', `...all done after ${Date.now() - start}ms`)
 
 			this.checkVariables()
 			this.checkFeedbacks()
 		} catch (error) {
 			c.abort() // cancel any OTHER pending request
 
-			this.log('debug', `One of the async API requests is rejected with error "` + String(error) + `" after ${Date.now() - start}ms`)
+			this.log('error', String(error))
+			this.log('debug', `...errored after ${Date.now() - start}ms`)
 
-			this.login()
-		} finally {
-			clearTimeout(t)
+			this.clearSession()
 		}
 	}
 
@@ -374,131 +417,38 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 	}
 
 	list_channels(data) {
-		const first = [{ id: '', label: 'None' }]
-		const c = first.concat(data.channels.map((channel) => ({ id: channel['name'], label: channel['name'] })))
-		if (this.CHOICES_CHANNELS.length !== c.length || !this.CHOICES_CHANNELS.every((channel, index) => channel.id === c[index].id && channel.label === c[index].label)) {
-			this.CHOICES_CHANNELS = c
+		const c = this.emptyList().concat(data.channels.map((channel) => ({ id: channel['name'], label: channel['name'] })))
+		if (
+			this.SOURCE_PRESETS.length !== c.length ||
+			!this.SOURCE_PRESETS.every((channel, index) => channel.id === c[index].id && channel.label === c[index].label)
+		) {
+			this.SOURCE_PRESETS = c
+			this.init_variables()
 			this.init_actions()
 			this.init_feedbacks()
+			this.init_presets()
 		}
 	}
 
 	get_ndi_sources(data) {
-		const first = [{ id: '', label: 'None' }]
-		const c = first.concat(data.sources.map((source) => ({ id: source['ndi-name'], label: source['ndi-name'] })))
-		if (this.CHOICES_NDI_SOURCES.length !== c.length || !this.CHOICES_NDI_SOURCES.every((source, index) => source.id === c[index].id && source.label === c[index].label)) {
-			this.CHOICES_NDI_SOURCES = c
+		const c = this.emptyList().concat(
+			data.sources.map((source) => ({ id: source['ndi-name'], label: source['ndi-name'] })),
+		)
+		if (
+			this.NDI_SOURCES.length !== c.length ||
+			!this.NDI_SOURCES.every((source, index) => source.id === c[index].id && source.label === c[index].label)
+		) {
+			this.NDI_SOURCES = c
+			this.init_variables()
 			this.init_actions()
 			this.init_feedbacks()
-		}
-	}
-
-	async sendCommand(method, args = '') {
-		if (this.isValidSession() || (await this.login())) {
-			if (args !== '') args = '&' + args
-
-			this.log('debug', 'GET mwapi?method=' + method + args)
-
-			const c = new AbortController()
-			const t = setTimeout(() => c.abort(), this.config.pollingrate)
-
-			try {
-				const data = await this.getAPI({ method: method + args, callback: undefined }, c.signal)
-				this.log('debug', 'OK ' + this.getLabel(api.STATUS_CODES, data.status))
-			} catch (error) {
-				this.log('debug', 'FAILED ' + String(error))
-			} finally {
-				clearTimeout(t)
-			}
-		} else {
-			this.log('error', 'Unable to send command. No connection to device.')
+			this.init_presets()
 		}
 	}
 
 	// Return config fields for web config
 	getConfigFields() {
-		return [
-			{
-				type: 'static-text',
-				id: 'info',
-				width: 12,
-				label: 'Information',
-				value: 'This module will control a Magewell Pro Convert Decoder Device.',
-			},
-			{
-				type: 'textinput',
-				id: 'host',
-				label: 'Device IP / Hostname',
-				width: 4,
-				// regex: this.REGEX_IP,
-			},
-			{
-				type: 'textinput',
-				id: 'username',
-				label: 'Username',
-				width: 4,
-				default: 'Admin',
-			},
-			{
-				type: 'textinput',
-				id: 'password',
-				label: 'Password',
-				width: 4,
-				default: 'Admin',
-			},
-			{
-				type: 'static-text',
-				id: 'dummy1',
-				width: 12,
-				label: ' ',
-				value: ' ',
-			},
-			{
-				type: 'static-text',
-				id: 'info2',
-				label: 'Polling',
-				width: 12,
-				value: `
-				<div class="alert alert-warning">
-					<strong>Please read:</strong>
-					<br>
-					Enabling polling unlocks these features:
-					<br><br>
-					<ul>
-						<li>Changes made at the device outside of this module</li>
-						<li>Currently selected channel, feedbacks, etc.</li>
-					</ul>
-					Enabling polling will send a request to the Device at a continuous interval.
-					<br>
-					<strong>This could have an undesired performance effect on your Device, depending on the polling rate.</strong>
-					<br>
-				</div>
-			`,
-			},
-			{
-				type: 'checkbox',
-				id: 'polling',
-				label: 'Enable Polling (necessary for feedbacks and variables)',
-				default: true,
-				width: 3,
-			},
-			{
-				type: 'number',
-				id: 'pollingrate',
-				label: 'Polling Rate (in ms)',
-				default: 1000,
-				min: 1,
-				max: 10000,
-				width: 3,
-				isVisible: (configValues) => configValues.polling === true,
-			},
-			{
-				type: 'checkbox',
-				id: 'verbose',
-				label: 'Enable Verbose Logging',
-				default: false,
-			},
-		]
+		return ConfigFields
 	}
 
 	// ##########################
