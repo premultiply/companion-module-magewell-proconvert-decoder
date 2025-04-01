@@ -4,8 +4,8 @@
 	"main": "src/index.js",
 	"type": "module",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
 		"format": "prettier -w .",
+		"package": "companion-module-build",
 		"lint:raw": "eslint",
 		"lint": "yarn lint:raw ."
 	},
@@ -15,13 +15,13 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"@companion-module/base": "^1.8.0",
-		"got": "^13.0.0",
-		"yarn": "^1.22.22"
+		"@companion-module/base": "~1.11.2"
 	},
 	"devDependencies": {
-		"@companion-module/tools": "^1.5.1",
-		"prettier": "^3.2.5"
+		"@companion-module/tools": "^2.1.1",
+		"eslint": "^9.23.0",
+		"prettier": "^3.5.3"
 	},
-	"prettier": "@companion-module/tools/.prettierrc.json"
+	"prettier": "@companion-module/tools/.prettierrc.json",
+	"packageManager": "yarn@4.5.3"
 }
