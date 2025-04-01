@@ -20,12 +20,12 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 	async destroy() {
 		this.clearSession()
 		this.stopPolling()
+		this.updateStatus(InstanceStatus.Disconnected)
 	}
 
 	// Initalize module
 	async init(config) {
 		this.config = config
-		//this.updateStatus(InstanceStatus.Disconnected, 'Initializing')
 
 		this.STATUS = {
 			summaryInfo: {
@@ -158,6 +158,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 	}
 
 	startPolling() {
+		clearInterval(this.pollID)
 		this.pollID = setInterval(() => this.poll(), this.config.pollingrate)
 		this.log('debug', 'Polling started with ' + this.config.pollingrate + 'ms interval')
 	}
@@ -190,78 +191,69 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		return values.find((v) => v.id === key)?.label
 	}
 
-	login() {
+	async login() {
 		this.log('debug', 'login()')
 
 		this.stopPolling()
 		this.clearSession()
 
-		this.updateStatus(InstanceStatus.Connecting)
+		this.updateStatus(InstanceStatus.Connecting, 'Connecting to ' + this.config.host)
 
 		let cookie = undefined
 
 		const url = `http://` + this.config.host + `/mwapi?method=login&id=` + this.config.username + `&pass=` + crypto.createHash('md5').update(this.config.password).digest('hex')
 		this.log('debug', 'GET ' + url)
 
-		const controller = new AbortController()
-		const t = setTimeout(() => controller.abort(), 10000)
+		const c = new AbortController()
+		const t = setTimeout(() => c.abort(), 10000)
 
 		const start = Date.now()
 
-		fetch(url, { signal: controller.signal })
-			.then((response) => {
-				if (response.ok) {
-					cookie = response.headers.getSetCookie()[0]
-					return response.json()
-				}
-			})
-			.then((data) => {
-				if (this.handleApiStatus(data)) {
+		try {
+			const response = await fetch(url, { signal: c.signal })
+			if (response.ok) {
+				cookie = response.headers.getSetCookie()[0]
+				if (this.apiStatusIsSuccess(await response.json())) {
 					this.log('debug', `login successful after ${Date.now() - start}ms`)
 					this.setupSession(cookie)
-					this.updateStatus(InstanceStatus.Ok)
+					this.updateStatus(InstanceStatus.Ok, 'Connected to ' + this.config.host)
+
+					return true
 				}
-			})
-			.catch((error) => {
-				this.log('error', `login failed after ${Date.now() - start}ms`)
-				if (error.name === 'AbortError') {
-					this.updateStatus(InstanceStatus.Disconnected, 'Timeout')
-				} else {
-					this.updateStatus(InstanceStatus.ConnectionFailure, String(error))
-				}
-			})
-			.finally(() => {
-				clearTimeout(t)
-				if (this.config.polling) this.startPolling()
-			})
+			}
+		} catch (error) {
+			this.log('error', `login attempt failed after ${Date.now() - start}ms`)
+			if (error.name === 'AbortError') {
+				this.updateStatus(InstanceStatus.Disconnected, 'Timeout')
+			} else {
+				this.updateStatus(InstanceStatus.ConnectionFailure, String(error))
+			}
+		} finally {
+			clearTimeout(t)
+			this.startPolling()
+		}
+
+		return false
 	}
 
-	getAPI(param, signal = undefined) {
-		return new Promise((resolve, reject) => {
-			if (!this.isValidSession()) reject('no session')
+	async getAPI(param, signal = undefined) {
+		if (!this.isValidSession()) throw new Error('no session')
 
-			const url = `http://` + this.config.host + `/mwapi?method=` + param.method
-			this.log('debug', 'GET ' + url)
+		const url = `http://` + this.config.host + `/mwapi?method=` + param.method
+		this.log('debug', 'GET ' + url)
 
-			fetch(url, { signal, headers: { cookie: this.session } })
-				.then((response) => {
-					if (response.ok) return response.json()
-				})
-				.then((data) => {
-					//console.log(data)
-					if (this.handleApiStatus(data)) {
-						if (param.callback !== undefined) param.callback.call(this, data)
-						resolve(data)
-					}
-					reject(data)
-				})
-				.catch((error) => {
-					reject(error)
-				})
-		})
+		const response = await fetch(url, { signal, headers: { cookie: this.session } })
+		if (!response.ok) throw new Error('HTTP error: ' + response.status)
+
+		const data = await response.json()
+		if (!this.apiStatusIsSuccess(data)) throw new Error('API operation was rejected')
+
+		if (param.callback !== undefined) param.callback.call(this, data)
+
+		return data
 	}
 
-	poll() {
+	async poll() {
 		this.log('debug', 'poll()')
 
 		if (!this.isValidSession()) {
@@ -277,35 +269,29 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 			{ method: `get-ndi-sources`, callback: this.get_ndi_sources },
 		]
 
-		const controller = new AbortController()
-		const promises = params.map((param) => this.getAPI(param, controller.signal))
+		const c = new AbortController()
+		const t = setTimeout(() => c.abort(), this.config.pollingrate / 2)
+		const requests = params.map((param) => this.getAPI(param, c.signal))
 
 		const start = Date.now()
+		try {
+			await Promise.all(requests)
+			this.log('debug', `All async API requests are resolved after ${Date.now() - start}ms`)
 
-		const t = setTimeout(() => controller.abort(), this.config.pollingrate / 2)
-		Promise.all(promises)
-			.then(() => {
-				// all promises fulfilled
-				this.log('debug', `All async API requests are resolved after ${Date.now() - start}ms`)
+			this.checkVariables()
+			this.checkFeedbacks()
+		} catch (error) {
+			c.abort() // cancel any OTHER pending request
 
-				this.checkVariables()
-				this.checkFeedbacks()
-			})
-			.catch((error) => {
-				// any of the promises is rejected (fastest wins)
-				// only first error will be catched here, any other will be silently discarded!
-				controller.abort() // cancel any OTHER pending request
+			this.log('debug', `One of the async API requests is rejected with error "` + String(error) + `" after ${Date.now() - start}ms`)
 
-				this.log('debug', `One of the async API requests is rejected with error "` + String(error) + `" after ${Date.now() - start}ms`)
-
-				this.login()
-			})
-			.finally(() => {
-				clearTimeout(t)
-			})
+			this.login()
+		} finally {
+			clearTimeout(t)
+		}
 	}
 
-	handleApiStatus(data) {
+	apiStatusIsSuccess(data) {
 		if (typeof data === 'undefined' || typeof data.status === 'undefined') {
 			this.updateStatus(InstanceStatus.UnknownError, 'Invalid API response from device')
 			return false
@@ -407,26 +393,26 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		}
 	}
 
-	sendCommand(method, args = '') {
-		if (args !== '') {
-			args = '&' + args
-		}
+	async sendCommand(method, args = '') {
+		if (this.isValidSession() || (await this.login())) {
+			if (args !== '') args = '&' + args
 
-		if (this.config.verbose) this.log('debug', 'GET mwapi?method=' + method + args)
+			this.log('debug', 'GET mwapi?method=' + method + args)
 
-		const controller = new AbortController()
-		const t = setTimeout(() => controller.abort(), this.config.pollingrate)
+			const c = new AbortController()
+			const t = setTimeout(() => c.abort(), this.config.pollingrate)
 
-		this.getAPI({ method: method + args, callback: undefined }, controller.signal)
-			.then((data) => {
+			try {
+				const data = await this.getAPI({ method: method + args, callback: undefined }, c.signal)
 				this.log('debug', 'OK ' + this.getLabel(api.STATUS_CODES, data.status))
-			})
-			.catch((error) => {
+			} catch (error) {
 				this.log('debug', 'FAILED ' + String(error))
-			})
-			.finally(() => {
+			} finally {
 				clearTimeout(t)
-			})
+			}
+		} else {
+			this.log('error', 'Unable to send command. No connection to device.')
+		}
 	}
 
 	// Return config fields for web config
