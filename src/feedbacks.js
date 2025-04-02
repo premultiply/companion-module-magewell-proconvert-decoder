@@ -13,7 +13,7 @@ export function setFeedbacks(self) {
 	//const colorBlue = combineRgb(0, 51, 204)
 	//const colorGrey = combineRgb(51, 51, 51)
 
-	feedbacks.sourcePresetSelected = {
+	feedbacks.sourcePresetName = {
 		type: 'boolean',
 		name: 'Source Preset selected',
 		description: 'Indicate if the Source Preset is currently selected for decoding',
@@ -24,14 +24,40 @@ export function setFeedbacks(self) {
 		options: [
 			{
 				type: 'dropdown',
-				label: 'Source Preset',
-				id: 'option',
-				default: self.SOURCE_PRESETS[0].id,
+				label: 'Preset Name',
+				id: 'name',
 				choices: self.SOURCE_PRESETS,
+				allowCustom: true,
 			},
 		],
 		callback: function (feedback) {
-			return self.STATUS.summaryInfo.source.name === feedback.options.option
+			return self.STATUS.summaryInfo.source.name === feedback.options.name
+		},
+	}
+
+	feedbacks.sourcePresetIndex = {
+		type: 'boolean',
+		name: 'Source Preset Index selected',
+		description: 'Indicate if the Source Preset # is currently selected for decoding',
+		defaultStyle: {
+			color: colorWhite,
+			bgcolor: colorRed,
+		},
+		options: [
+			{
+				type: 'number',
+				label: 'Preset #',
+				id: 'index',
+				required: true,
+				min: 0,
+				//max: self.SOURCE_PRESETS.length - 1,
+				default: 0,
+			},
+		],
+		callback: function (feedback) {
+			return feedback.options.index >= 0 && feedback.options.index < self.SOURCE_PRESETS.length
+				? self.STATUS.summaryInfo.source.name === self.SOURCE_PRESETS[feedback.options.index].id
+				: false
 		},
 	}
 
@@ -47,13 +73,14 @@ export function setFeedbacks(self) {
 			{
 				type: 'dropdown',
 				label: 'NDI Source',
-				id: 'option',
-				default: self.NDI_SOURCES[0].id,
+				id: 'name',
 				choices: self.NDI_SOURCES,
+				//default: self.NDI_SOURCES[0].id,
+				allowCustom: true,
 			},
 		],
 		callback: function (feedback) {
-			return self.STATUS.summaryInfo.source.name === feedback.options.option
+			return self.STATUS.summaryInfo.source.name === feedback.options.name
 		},
 	}
 

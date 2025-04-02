@@ -81,8 +81,8 @@ export function setPresets(self) {
 			category: 'Source Presets by Name',
 			name: `Select Source Preset "${preset.id}"`,
 			style: {
-				text: 'PRESET\\n\\n' + preset.id,
-				size: '7',
+				text: preset.id,
+				size: '14',
 				color: colorWhite,
 				bgcolor: colorBlack,
 			},
@@ -95,14 +95,25 @@ export function setPresets(self) {
 						{
 							actionId: 'select_preset_name',
 							options: {
-								channel: preset.id,
+								name: preset.id,
 							},
 						},
 					],
 					up: [],
 				},
 			],
-			feedbacks: [],
+			feedbacks: [
+				{
+					feedbackId: 'sourcePresetName',
+					options: {
+						name: preset.id,
+					},
+					style: {
+						color: colorWhite,
+						bgcolor: colorDarkBlue,
+					},
+				},
+			],
 		}
 	})
 
@@ -126,14 +137,25 @@ export function setPresets(self) {
 						{
 							actionId: 'select_preset_index',
 							options: {
-								channel: index,
+								index: index,
 							},
 						},
 					],
 					up: [],
 				},
 			],
-			feedbacks: [],
+			feedbacks: [
+				{
+					feedbackId: 'sourcePresetIndex',
+					options: {
+						index: index,
+					},
+					style: {
+						color: colorWhite,
+						bgcolor: colorDarkBlue,
+					},
+				},
+			],
 		}
 	})
 

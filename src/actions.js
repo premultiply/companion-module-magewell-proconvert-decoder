@@ -355,11 +355,12 @@ export function setActions(self) {
 		options: [
 			{
 				type: 'number',
-				label: 'Preset Index',
+				label: 'Preset #',
 				id: 'index',
 				required: true,
 				min: 0,
 				//max: self.SOURCE_PRESETS.length - 1,
+				default: 0,
 			},
 		],
 		callback: (action) => {
@@ -378,14 +379,14 @@ export function setActions(self) {
 			{
 				type: 'dropdown',
 				label: 'NDI Source',
-				id: 'ndisource',
+				id: 'name',
 				choices: self.NDI_SOURCES,
 				//default: self.NDI_SOURCES[0].id,
 				allowCustom: true,
 			},
 		],
 		callback: (action) => {
-			self.sendCommand('set-channel', 'ndi-name=true&name=' + action.options.ndisource)
+			self.sendCommand('set-channel', 'ndi-name=true&name=' + action.options.name)
 		},
 	}
 
