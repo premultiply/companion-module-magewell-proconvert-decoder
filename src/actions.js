@@ -349,7 +349,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.select_preset_index = {
+	actions.selectPresetIndex = {
 		name: 'Select Source Preset by Index',
 		description: 'Select a source preset for decoding by its position in the list',
 		options: [
@@ -372,21 +372,45 @@ export function setActions(self) {
 		},
 	}
 
-	actions.select_ndi_source = {
-		name: 'Select NDI Source',
-		description: 'Select an available NDI source for decoding',
+	actions.selectSourceName = {
+		name: 'Select Source',
+		description: 'Select either an available NDI source or a Source Preset for decoding',
 		options: [
 			{
-				type: 'dropdown',
+				type: 'checkbox',
 				label: 'NDI Source',
-				id: 'name',
-				choices: self.NDI_SOURCES,
-				//default: self.NDI_SOURCES[0].id,
+				tooltip: 'Enable to select an available NDI source, otherwise select a source from the preset list',
+				id: 'isNameNDI',
+				default: false,
+			},
+			{
+				type: 'dropdown',
+				label: 'Preset Name',
+				tooltip:
+					'Select a Source Preset name for decoding. Source Presets can be created, edited and removed in the device web interface.',
+				id: 'nameSource',
+				choices: self.SOURCE_PRESETS,
 				allowCustom: true,
+				isVisible: (options) => options.isNameNDI === false,
+			},
+			{
+				type: 'dropdown',
+				label: 'Source',
+				tooltip: 'List of NDI sources currently available for decoding. The list is updated automatically.',
+				id: 'nameNDI',
+				choices: self.NDI_SOURCES,
+				allowCustom: true,
+				isVisible: (options) => options.isNameNDI === true,
 			},
 		],
 		callback: (action) => {
-			self.sendCommand('set-channel', 'ndi-name=true&name=' + action.options.name)
+			self.sendCommand(
+				'set-channel',
+				'ndi-name=' +
+					(action.options.isNameNDI || action.options.nameSource === '' ? 'true' : 'false') +
+					'&name=' +
+					(action.options.isNameNDI ? action.options.nameNDI : action.options.nameSource),
+			)
 		},
 	}
 

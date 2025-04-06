@@ -422,6 +422,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 			this.SOURCE_PRESETS.length !== c.length ||
 			!this.SOURCE_PRESETS.every((channel, index) => channel.id === c[index].id && channel.label === c[index].label)
 		) {
+			this.log('debug', 'Source presets updated')
 			this.SOURCE_PRESETS = c
 			this.init_variables()
 			this.init_actions()
@@ -438,6 +439,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 			this.NDI_SOURCES.length !== c.length ||
 			!this.NDI_SOURCES.every((source, index) => source.id === c[index].id && source.label === c[index].label)
 		) {
+			this.log('debug', 'NDI sources updated')
 			this.NDI_SOURCES = c
 			this.init_variables()
 			this.init_actions()

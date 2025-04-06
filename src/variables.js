@@ -5,6 +5,7 @@ export function setVariables(self) {
 	const variables = []
 
 	// Summary Info
+	variables.push({ variableId: 'deviceName', name: 'Device - Name' })
 	variables.push({ variableId: 'deviceModel', name: 'Device - Model' })
 	variables.push({ variableId: 'deviceProductId', name: 'Device - Product ID' })
 	variables.push({ variableId: 'deviceSerialNo', name: 'Device - Serial number' })
@@ -99,6 +100,7 @@ export function checkVariables(self) {
 	const bitrate = self.STATUS.summaryInfo.source.videoBitRate + self.STATUS.summaryInfo.source.audioBitRate
 
 	self.setVariableValues({
+		deviceName: self.STATUS.summaryInfo.device.name,
 		deviceModel: self.STATUS.summaryInfo.device.model,
 		deviceProductId: self.STATUS.summaryInfo.device.productId,
 		deviceSerialNo: self.STATUS.summaryInfo.device.serialNo,

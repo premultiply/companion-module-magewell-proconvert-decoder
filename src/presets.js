@@ -43,7 +43,7 @@ export function setPresets(self) {
 	presets['systemReboot'] = {
 		type: 'button',
 		category: 'System',
-		name: 'Reboot Device (Hold 2s)',
+		name: 'Reboot Device (Hold for 2s)',
 		style: {
 			text: 'Reboot',
 			size: '14',
