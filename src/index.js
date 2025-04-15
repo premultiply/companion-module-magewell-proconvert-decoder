@@ -19,9 +19,9 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 
 	// Cleanup when the module gets deleted or disabled.
 	async destroy() {
+		this.controller.abort()
 		this.clearSession()
 		this.disablePolling()
-		this.controller.abort()
 		this.updateStatus(InstanceStatus.Disconnected)
 	}
 
@@ -212,11 +212,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		let setCookie = undefined
 
 		const url =
-			`http://` +
-			this.config.host +
-			`/mwapi?method=login&id=` +
-			this.config.username +
-			`&pass=` +
+			`http://${this.config.host}/mwapi?method=login&id=${this.config.username}&pass=` +
 			crypto.createHash('md5').update(this.config.password).digest('hex')
 		this.log('debug', 'GET ' + url)
 
@@ -244,10 +240,8 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				this.updateStatus(InstanceStatus.ConnectionFailure, String(error))
 			}
 		} finally {
-			if (this.config.polling) this.enablePolling()
+			if (!this.controller.signal.aborted && this.config.polling) this.enablePolling()
 		}
-
-		return null
 	}
 
 	async sendCommand(method, args = '') {
