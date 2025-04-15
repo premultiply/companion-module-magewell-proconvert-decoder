@@ -19,9 +19,9 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 
 	// Cleanup when the module gets deleted or disabled.
 	async destroy() {
+		this.disablePolling()
 		this.controller.abort()
 		this.clearSession()
-		this.disablePolling()
 		this.updateStatus(InstanceStatus.Disconnected)
 	}
 
@@ -156,9 +156,9 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 
 	// Update module after a config change
 	async configUpdated(config) {
-		this.clearSession()
 		this.disablePolling()
 		this.controller.abort()
+		this.clearSession()
 		this.updateStatus(InstanceStatus.Disconnected, 'Config changed')
 
 		this.init(config)
