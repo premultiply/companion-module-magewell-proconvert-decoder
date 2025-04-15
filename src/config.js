@@ -53,7 +53,7 @@ export const ConfigFields = [
 		width: 7,
 		label: 'Polling',
 		value:
-			'Enables periodic updates of the device status and configuration. This must be activated in order for feedbacks and variables to reflect the current device status. The interval setting specifies the time between the requests to the device.',
+			'Enables periodic updates of the device status and configuration. This must be activated in order for feedbacks and variables to reflect the current device status. The interval setting specifies the interval (and appropriate timeout) for the repeated requests to the device.',
 	},
 	{
 		type: 'number',
