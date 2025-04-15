@@ -5,17 +5,11 @@ export function setPresets(self) {
 
 	const colorWhite = combineRgb(255, 255, 255)
 	const colorRed = combineRgb(255, 0, 0)
-	const colorOrange = combineRgb(255, 102, 0)
+	const colorGreen = combineRgb(0, 204, 0)
 	const colorYellow = combineRgb(255, 255, 0)
-	const colorGreen = combineRgb(0, 255, 0)
-	//const colorPurple = combineRgb(255, 0, 255)
-	//const colorActiveBlue = combineRgb(0, 51, 204)
 	const colorBlue = combineRgb(0, 51, 204)
+	const colorPurple = combineRgb(255, 0, 255)
 	const colorDarkRed = combineRgb(102, 0, 0)
-	const colorDarkYellow = combineRgb(102, 102, 0)
-	const colorDarkBlue = combineRgb(0, 0, 102)
-	const colorDarkGreen = combineRgb(0, 102, 0)
-	const colorGrey = combineRgb(51, 51, 51)
 	const colorBlack = combineRgb(0, 0, 0)
 
 	presets['dashboardSourceConnected'] = {
@@ -34,7 +28,7 @@ export function setPresets(self) {
 				feedbackId: 'sourceConnected',
 				style: {
 					color: colorWhite,
-					bgcolor: colorDarkGreen,
+					bgcolor: colorGreen,
 				},
 			},
 		],
@@ -71,6 +65,94 @@ export function setPresets(self) {
 		feedbacks: [],
 	}
 
+	presets['videoFollowInput'] = {
+		type: 'button',
+		category: 'System',
+		name: 'Video Follow Input',
+		style: {
+			text: 'Video Follow Input',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'videoConfigFollowInputMode',
+						options: {
+							mode: true,
+						},
+					},
+					{
+						actionId: 'videoConfigDeinterlaceMode',
+						options: {
+							mode: 'weave',
+						},
+					},
+					{
+						actionId: 'videoConfigAutoColorFormat',
+						options: {
+							auto: true,
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['audioFollowInput'] = {
+		type: 'button',
+		category: 'System',
+		name: 'Audio Follow Input',
+		style: {
+			text: 'Audio Follow Input',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'audioConfigGain',
+						options: {
+							gain: 20.0,
+						},
+					},
+					{
+						actionId: 'audioConfigConvertMode',
+						options: {
+							mode: 'smpte',
+						},
+					},
+					{
+						actionId: 'audioConfigSamplerate',
+						options: {
+							samplerate: '0',
+						},
+					},
+					{
+						actionId: 'audioConfigChannelCount',
+						options: {
+							channels: '0',
+						},
+					},
+					{
+						actionId: 'videoConfigVUMeterMode',
+						options: {
+							mode: 'post-gain-dbfs',
+						},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
 	// #################
 	// #### Presets ####
 	// #################
@@ -93,7 +175,7 @@ export function setPresets(self) {
 				{
 					down: [
 						{
-							actionId: 'select_preset_name',
+							actionId: 'selectPresetName',
 							options: {
 								name: preset.id,
 							},
@@ -110,7 +192,7 @@ export function setPresets(self) {
 					},
 					style: {
 						color: colorWhite,
-						bgcolor: colorDarkBlue,
+						bgcolor: colorBlue,
 					},
 				},
 			],
@@ -135,7 +217,7 @@ export function setPresets(self) {
 				{
 					down: [
 						{
-							actionId: 'select_preset_index',
+							actionId: 'selectPresetIndex',
 							options: {
 								index: index,
 							},
@@ -152,7 +234,7 @@ export function setPresets(self) {
 					},
 					style: {
 						color: colorWhite,
-						bgcolor: colorDarkBlue,
+						bgcolor: colorBlue,
 					},
 				},
 			],

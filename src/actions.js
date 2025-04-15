@@ -4,7 +4,7 @@
 export function setActions(self) {
 	const actions = {}
 
-	actions.videoconfig_showtitle = {
+	actions.videoConfigShowTitle = {
 		name: 'Video Config - Show Source Name and Resolution',
 		options: [
 			{
@@ -19,7 +19,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_showtally = {
+	actions.videoConfigShowTally = {
 		name: 'Video Config - Show Tally',
 		options: [
 			{
@@ -34,7 +34,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_showvumeter = {
+	actions.videoConfigShowVUMeter = {
 		name: 'Video Config - Show VU Meter',
 		options: [
 			{
@@ -49,7 +49,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_vumetermode = {
+	actions.videoConfigVUMeterMode = {
 		name: 'Video Config - VU Meter Mode',
 		options: [
 			{
@@ -59,9 +59,9 @@ export function setActions(self) {
 				default: 'none',
 				choices: [
 					{ id: 'none', label: 'None' },
-					{ id: 'dbu', label: 'dBU' },
-					{ id: 'dbvu', label: 'dBVU' },
-					{ id: 'dbfs', label: 'dBFS' },
+					{ id: 'db', label: 'dBVU/dBu scale' },
+					{ id: 'post-gain-db', label: 'Post gain dBVU/dBu scale' },
+					{ id: 'post-gain-dbfs', label: 'Post gain dBFS scale' },
 				],
 			},
 		],
@@ -70,7 +70,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_showcentercross = {
+	actions.videoConfigShowCenterCross = {
 		name: 'Video Config - Show Center Cross',
 		options: [
 			{
@@ -85,7 +85,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_safeareamode = {
+	actions.videoConfigSafeareaMode = {
 		name: 'Video Config - Safe Area Mode',
 		options: [
 			{
@@ -106,7 +106,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_identmode = {
+	actions.videoConfigIdentMode = {
 		name: 'Video Config - Ident Mode',
 		options: [
 			{
@@ -126,7 +126,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_identtext = {
+	actions.videoConfigIdentText = {
 		name: 'Video Config - Ident Text',
 		options: [
 			{
@@ -141,7 +141,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_hflip = {
+	actions.videoConfigHFlip = {
 		name: 'Video Config - Horizontal Flip',
 		options: [
 			{
@@ -156,7 +156,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_vflip = {
+	actions.videoConfigVFlip = {
 		name: 'Video Config - Vertical Flip',
 		options: [
 			{
@@ -171,7 +171,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_deinterlacemode = {
+	actions.videoConfigDeinterlaceMode = {
 		name: 'Video Config - Deinterlace Mode',
 		options: [
 			{
@@ -190,7 +190,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_arconvertmode = {
+	actions.videoConfigArcConvertMode = {
 		name: 'Video Config - Aspect Ratio Convert Mode',
 		options: [
 			{
@@ -210,7 +210,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_autocolorfmt = {
+	actions.videoConfigAutoColorFormat = {
 		name: 'Video Config - Auto Color Format',
 		options: [
 			{
@@ -225,7 +225,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_colorfmt = {
+	actions.videoConfigColorFormat = {
 		name: 'Video Config - Color Format',
 		options: [
 			{
@@ -244,7 +244,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoconfig_switchmode = {
+	actions.videoConfigSwitchMode = {
 		name: 'Video Config - Switch Mode',
 		options: [
 			{
@@ -264,7 +264,43 @@ export function setActions(self) {
 		},
 	}
 
-	actions.audioconfig_gain = {
+	actions.videoConfigFollowInputMode = {
+		name: 'Video Config - Follow Input Mode',
+		options: [
+			{
+				type: 'checkbox',
+				label: 'Follow input',
+				id: 'mode',
+				tooltip: 'Output resolution keeps consistent with that of the input source',
+				default: false,
+			},
+		],
+		callback: async (action) => {
+			await self.sendCommand('set-video-config', 'follow-input-mode=' + action.options.mode)
+		},
+	}
+
+	actions.audioConfigConvertMode = {
+		name: 'Audio Config - Convert Mode',
+		options: [
+			{
+				type: 'dropdown',
+				label: 'Convert Mode',
+				id: 'mode',
+				tooltip: 'Audio scale for the measurement of the volume',
+				default: 'smpte',
+				choices: [
+					{ id: 'smpte', label: 'SMPTE' },
+					{ id: 'ebu', label: 'EBU' },
+				],
+			},
+		],
+		callback: async (action) => {
+			await self.sendCommand('set-audio-config', 'convert-mode=' + action.options.mode)
+		},
+	}
+
+	actions.audioConfigGain = {
 		name: 'Audio Config - Gain',
 		options: [
 			{
@@ -274,7 +310,7 @@ export function setActions(self) {
 				tooltip: 'Sets the gain level (-100.00dB - 20.00 dB)',
 				min: -100,
 				max: 20,
-				default: 0.0,
+				default: 20.0,
 				step: 0.1,
 				required: true,
 				range: true,
@@ -285,12 +321,12 @@ export function setActions(self) {
 		},
 	}
 
-	actions.audioconfig_samplerate = {
+	actions.audioConfigSamplerate = {
 		name: 'Audio Config - Samplerate',
 		options: [
 			{
 				type: 'dropdown',
-				label: 'Sample Rate',
+				label: 'Samplerate',
 				id: 'samplerate',
 				default: '48000',
 				choices: [
@@ -304,11 +340,11 @@ export function setActions(self) {
 			},
 		],
 		callback: async (action) => {
-			await self.sendCommand('set-audio-config', 'samplerate=' + action.options.samplerate)
+			await self.sendCommand('set-audio-config', 'sample-rate=' + action.options.samplerate)
 		},
 	}
 
-	actions.audioconfig_channelcount = {
+	actions.audioConfigChannelCount = {
 		name: 'Audio Config - Channel count',
 		options: [
 			{
@@ -329,7 +365,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.select_preset_name = {
+	actions.selectPresetName = {
 		name: 'Select Source Preset',
 		description: 'Select a source preset for decoding',
 		options: [

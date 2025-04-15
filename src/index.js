@@ -113,7 +113,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				//sampleRate: null,
 				//channels: null,
 				//bitCount: null,
-				//convertMode: null,
+				convertMode: null,
 				//ch0: null,
 				//ch1: null,
 				//ch2: null,
@@ -407,6 +407,7 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 
 	get_audio_config(data) {
 		this.STATUS.audioConfig.checkPts = data['check-pts']
+		this.STATUS.audioConfig.convertMode = data['convert-mode']
 		this.STATUS.audioConfig.gain = data['gain']
 	}
 

@@ -50,7 +50,7 @@ export function setVariables(self) {
 	// Video Config
 	variables.push({ variableId: 'configVideoShowTitle', name: 'Video Config - OSD - Show source name & resolution' })
 	variables.push({ variableId: 'configVideoShowTally', name: 'Video Config - OSD - Show tally indicators' })
-	variables.push({ variableId: 'configVideoShowVumeter', name: 'Video Config - OSD - Show audio meter' })
+	variables.push({ variableId: 'configVideoShowVUMeter', name: 'Video Config - OSD - Show audio meter' })
 	variables.push({ variableId: 'configVideoShowCenterCross', name: 'Video Config - OSD - Show center cross' })
 	variables.push({ variableId: 'configVideoIdentMode', name: 'Video Config - OSD - Ident Mode' })
 	variables.push({ variableId: 'configVideoIdentText', name: 'Video Config - OSD - Ident Text' })
@@ -60,6 +60,7 @@ export function setVariables(self) {
 
 	// Audio Config
 	variables.push({ variableId: 'configAudioCheckPts', name: 'Audio Config - Check audio PTS' })
+	variables.push({ variableId: 'configAudioConvertMode', name: 'Audio Config - Convert Mode' })
 	variables.push({ variableId: 'configAudioGain', name: 'Audio Config - Gain (dB)' })
 
 	// Source Presets
@@ -135,7 +136,7 @@ export function checkVariables(self) {
 		sourceAudioBitCount: self.STATUS.summaryInfo.source.audioBitCount,
 		configVideoShowTitle: self.STATUS.videoConfig.showTitle,
 		configVideoShowTally: self.STATUS.videoConfig.showTally,
-		configVideoShowVumeter: self.STATUS.videoConfig.showVUMeter,
+		configVideoShowVUMeter: self.STATUS.videoConfig.showVUMeter,
 		configVideoShowCenterCross: self.STATUS.videoConfig.showCenterCross,
 		configVideoIdentMode: self.STATUS.videoConfig.identMode,
 		configVideoIdentText: self.STATUS.videoConfig.identText,
@@ -143,6 +144,7 @@ export function checkVariables(self) {
 		configVideoSwitchMode: self.STATUS.videoConfig.switchMode,
 		configVideoFollowInputMode: self.STATUS.videoConfig.followInputMode,
 		configAudioCheckPts: self.STATUS.audioConfig.checkPts,
+		configAudioConvertMode: self.STATUS.audioConfig.convertMode,
 		configAudioGain: self.STATUS.audioConfig.gain,
 
 		// Custom variables
