@@ -89,19 +89,19 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 				showTitle: null,
 				showTally: null,
 				showVUMeter: null,
-				//vuMeterMode: null,
+				vuMeterMode: null,
 				showCenterCross: null,
 				followInputMode: null,
-				//safeAreaMode: null,
+				safeAreaMode: null,
 				identMode: null,
 				identText: null,
-				//hFlip: null,
-				//vFlip: null,
+				hFlip: null,
+				vFlip: null,
 				switchMode: null,
 				deinterlaceMode: null,
-				//arConvertMode: null,
-				//inAutoColorFmt: null,
-				//inColorFmt: null,
+				arConvertMode: null,
+				inAutoColorFmt: null,
+				inColorFmt: null,
 				//clipLeft: null,
 				//clipTop: null,
 				//clipRight: null,
@@ -110,8 +110,8 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 			audioConfig: {
 				checkPts: null,
 				gain: null,
-				//sampleRate: null,
-				//channels: null,
+				sampleRate: null,
+				channels: null,
 				//bitCount: null,
 				convertMode: null,
 				//ch0: null,
@@ -397,18 +397,27 @@ class MagewellProConvertDecoderInstance extends InstanceBase {
 		this.STATUS.videoConfig.showTitle = data['show-title']
 		this.STATUS.videoConfig.showTally = data['show-tally']
 		this.STATUS.videoConfig.showVUMeter = data['show-vu-meter']
+		this.STATUS.videoConfig.vuMeterMode = data['vu-meter-mode']
 		this.STATUS.videoConfig.showCenterCross = data['show-center-cross']
 		this.STATUS.videoConfig.followInputMode = data['follow-input-mode']
+		this.STATUS.videoConfig.safeAreaMode = data['safe-area-mode']
 		this.STATUS.videoConfig.identMode = data['ident-mode']
 		this.STATUS.videoConfig.identText = data['ident-text']
+		this.STATUS.videoConfig.hFlip = data['h-flip']
+		this.STATUS.videoConfig.vFlip = data['v-flip']
 		this.STATUS.videoConfig.switchMode = data['switch-mode']
 		this.STATUS.videoConfig.deinterlaceMode = data['deinterlace-mode']
+		this.STATUS.videoConfig.arConvertMode = data['ar-convert-mode']
+		this.STATUS.videoConfig.inAutoColorFmt = data['in-auto-color-fmt']
+		this.STATUS.videoConfig.inColorFmt = data['in-color-fmt']
 	}
 
 	get_audio_config(data) {
 		this.STATUS.audioConfig.checkPts = data['check-pts']
-		this.STATUS.audioConfig.convertMode = data['convert-mode']
 		this.STATUS.audioConfig.gain = data['gain']
+		this.STATUS.audioConfig.sampleRate = data['sample-rate']
+		this.STATUS.audioConfig.channels = data['channels']
+		this.STATUS.audioConfig.convertMode = data['convert-mode']
 	}
 
 	list_channels(data) {

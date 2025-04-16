@@ -51,17 +51,26 @@ export function setVariables(self) {
 	variables.push({ variableId: 'configVideoShowTitle', name: 'Video Config - OSD - Show source name & resolution' })
 	variables.push({ variableId: 'configVideoShowTally', name: 'Video Config - OSD - Show tally indicators' })
 	variables.push({ variableId: 'configVideoShowVUMeter', name: 'Video Config - OSD - Show audio meter' })
+	variables.push({ variableId: 'configVideoVUMeterMode', name: 'Video Config - OSD - Audio meter scale' })
 	variables.push({ variableId: 'configVideoShowCenterCross', name: 'Video Config - OSD - Show center cross' })
+	variables.push({ variableId: 'configVideoFollowInputMode', name: 'Video Config - Resolution - Follow input' })
+	variables.push({ variableId: 'configVideoSafeAreaMode', name: 'Video Config - OSD - Safe area' })
 	variables.push({ variableId: 'configVideoIdentMode', name: 'Video Config - OSD - Ident Mode' })
 	variables.push({ variableId: 'configVideoIdentText', name: 'Video Config - OSD - Ident Text' })
-	variables.push({ variableId: 'configVideoDeinterlaceMode', name: 'Video Config - Process - Deinterlace mode' })
+	variables.push({ variableId: 'configVideoHFlip', name: 'Video Config - Process - Horizontal flip' })
+	variables.push({ variableId: 'configVideoVFlip', name: 'Video Config - Process - Vertical flip' })
 	variables.push({ variableId: 'configVideoSwitchMode', name: 'Video Config - Source - Display after source lost' })
-	variables.push({ variableId: 'configVideoFollowInputMode', name: 'Video Config - Resolution - Follow input' })
+	variables.push({ variableId: 'configVideoDeinterlaceMode', name: 'Video Config - Process - Deinterlace mode' })
+	variables.push({ variableId: 'configVideoARConvertMode', name: 'Video Config - Process - AR convert' })
+	variables.push({ variableId: 'configVideoInAutoColorFmt', name: 'Video Config - Source - Auto color encoding' })
+	variables.push({ variableId: 'configVideoInColorFmt', name: 'Video Config - Source - Color encoding' })
 
 	// Audio Config
 	variables.push({ variableId: 'configAudioCheckPts', name: 'Audio Config - Check audio PTS' })
-	variables.push({ variableId: 'configAudioConvertMode', name: 'Audio Config - Convert Mode' })
 	variables.push({ variableId: 'configAudioGain', name: 'Audio Config - Gain (dB)' })
+	variables.push({ variableId: 'configAudioSampleRate', name: 'Audio Config - Sample Rate (Hz)' })
+	variables.push({ variableId: 'configAudioChannels', name: 'Audio Config - Channel count' })
+	variables.push({ variableId: 'configAudioConvertMode', name: 'Audio Config - Convert Mode' })
 
 	// Source Presets
 	self.SOURCE_PRESETS.forEach((channel, index) => {
@@ -113,9 +122,11 @@ export function checkVariables(self) {
 		deviceCoreTemp: self.STATUS.summaryInfo.device.coreTemp?.toFixed(2),
 		deviceBoardId: self.STATUS.summaryInfo.device.boardId,
 		deviceUpTime: self.STATUS.summaryInfo.device.upTime,
+
 		ethernetState: self.STATUS.summaryInfo.ethernet.state,
 		ethernetTxSpeedKbps: self.STATUS.summaryInfo.ethernet.txSpeedKbps,
 		ethernetRxSpeedKbps: self.STATUS.summaryInfo.ethernet.rxSpeedKbps,
+
 		sourceName: self.STATUS.summaryInfo.source.name,
 		sourceUrl: self.STATUS.summaryInfo.source.url,
 		sourceConnected: self.STATUS.summaryInfo.source.connected,
@@ -134,18 +145,29 @@ export function checkVariables(self) {
 		sourceAudioNumChannels: self.STATUS.summaryInfo.source.audioNumChannels,
 		sourceAudioSampleRate: self.STATUS.summaryInfo.source.audioSampleRate,
 		sourceAudioBitCount: self.STATUS.summaryInfo.source.audioBitCount,
+
 		configVideoShowTitle: self.STATUS.videoConfig.showTitle,
 		configVideoShowTally: self.STATUS.videoConfig.showTally,
 		configVideoShowVUMeter: self.STATUS.videoConfig.showVUMeter,
+		configVideoVUMeterMode: self.STATUS.videoConfig.vuMeterMode,
 		configVideoShowCenterCross: self.STATUS.videoConfig.showCenterCross,
+		configVideoFollowInputMode: self.STATUS.videoConfig.followInputMode,
+		configVideoSafeAreaMode: self.STATUS.videoConfig.safeAreaMode,
 		configVideoIdentMode: self.STATUS.videoConfig.identMode,
 		configVideoIdentText: self.STATUS.videoConfig.identText,
-		configVideoDeinterlaceMode: self.STATUS.videoConfig.deinterlaceMode,
+		configVideoHFlip: self.STATUS.videoConfig.hFlip,
+		configVideoVFlip: self.STATUS.videoConfig.vFlip,
 		configVideoSwitchMode: self.STATUS.videoConfig.switchMode,
-		configVideoFollowInputMode: self.STATUS.videoConfig.followInputMode,
+		configVideoDeinterlaceMode: self.STATUS.videoConfig.deinterlaceMode,
+		configVideoARConvertMode: self.STATUS.videoConfig.arConvertMode,
+		configVideoInAutoColorFmt: self.STATUS.videoConfig.inAutoColorFmt,
+		configVideoInColorFmt: self.STATUS.videoConfig.inColorFmt,
+
 		configAudioCheckPts: self.STATUS.audioConfig.checkPts,
-		configAudioConvertMode: self.STATUS.audioConfig.convertMode,
 		configAudioGain: self.STATUS.audioConfig.gain,
+		configAudioSampleRate: self.STATUS.audioConfig.sampleRate,
+		configAudioChannels: self.STATUS.audioConfig.channels,
+		configAudioConvertMode: self.STATUS.audioConfig.convertMode,
 
 		// Custom variables
 		sourceUrlType: (self.STATUS.summaryInfo.source.url?.split(':')[0] ?? '').toUpperCase(),
