@@ -34,6 +34,60 @@ export function setPresets(self) {
 		],
 	}
 
+	presets['dashboardTallyProgram'] = {
+		type: 'button',
+		category: 'Dashboard',
+		name: 'Tally Program',
+		style: {
+			text: 'TALLY\\nProgram',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [
+			{
+				down: [],
+				up: [],
+			},
+		],
+		feedbacks: [
+			{
+				feedbackId: 'sourceTallyProgram',
+				style: {
+					color: colorWhite,
+					bgcolor: colorRed,
+				},
+			},
+		],
+	}
+
+	presets['dashboardTallyPreview'] = {
+		type: 'button',
+		category: 'Dashboard',
+		name: 'Tally Preview',
+		style: {
+			text: 'TALLY\\nPreview',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [
+			{
+				down: [],
+				up: [],
+			},
+		],
+		feedbacks: [
+			{
+				feedbackId: 'sourceTallyPreview',
+				style: {
+					color: colorWhite,
+					bgcolor: colorGreen,
+				},
+			},
+		],
+	}
+
 	presets['systemReboot'] = {
 		type: 'button',
 		category: 'System',

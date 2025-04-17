@@ -85,7 +85,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoConfigSafeareaMode = {
+	actions.videoConfigSafeAreaMode = {
 		name: 'Video Config - Safe Area Mode',
 		options: [
 			{
@@ -134,10 +134,14 @@ export function setActions(self) {
 				label: 'Ident Text',
 				id: 'text',
 				default: '',
+				useVariables: true,
 			},
 		],
 		callback: async (action) => {
-			await self.sendCommand('set-video-config', 'ident-text=' + action.options.text)
+			await self.sendCommand(
+				'set-video-config',
+				'ident-text=' + (await self.parseVariablesInString(action.options.text)),
+			)
 		},
 	}
 
@@ -190,7 +194,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoConfigArcConvertMode = {
+	actions.videoConfigARConvertMode = {
 		name: 'Video Config - Aspect Ratio Convert Mode',
 		options: [
 			{
@@ -210,7 +214,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoConfigAutoColorFormat = {
+	actions.videoConfigAutoColorFmt = {
 		name: 'Video Config - Auto Color Format',
 		options: [
 			{
@@ -225,7 +229,7 @@ export function setActions(self) {
 		},
 	}
 
-	actions.videoConfigColorFormat = {
+	actions.videoConfigColorFmt = {
 		name: 'Video Config - Color Format',
 		options: [
 			{
@@ -366,8 +370,8 @@ export function setActions(self) {
 	}
 
 	actions.selectPresetName = {
-		name: 'Select Source Preset',
-		description: 'Select a source preset for decoding',
+		name: 'Select Source Preset by Name',
+		description: 'Select a source preset for decoding by its preset name',
 		options: [
 			{
 				type: 'dropdown',
@@ -387,7 +391,7 @@ export function setActions(self) {
 
 	actions.selectPresetIndex = {
 		name: 'Select Source Preset by Index',
-		description: 'Select a source preset for decoding by its position in the list',
+		description: 'Select a source preset for decoding by its position in the preset list',
 		options: [
 			{
 				type: 'number',
@@ -423,29 +427,36 @@ export function setActions(self) {
 				type: 'dropdown',
 				label: 'Preset Name',
 				tooltip:
-					'Select a Source Preset name for decoding. Source Presets can be created, edited and removed in the device web interface.',
+					'Select a Source Preset name for decoding. Source Presets can be created, edited and removed in the device web interface.' +
+					'You can also enter another preset name manually or by using variables.',
 				id: 'nameSource',
 				choices: self.SOURCE_PRESETS,
 				allowCustom: true,
+				useVariables: true,
 				isVisible: (options) => options.isNameNDI === false,
 			},
 			{
 				type: 'dropdown',
 				label: 'Source',
-				tooltip: 'List of NDI sources currently available for decoding. The list is updated automatically.',
+				tooltip:
+					'List of NDI sources currently available for decoding. The list is updated automatically.' +
+					'You can also enter another NDI source name manually or by using variables.',
 				id: 'nameNDI',
 				choices: self.NDI_SOURCES,
 				allowCustom: true,
+				useVariables: true,
 				isVisible: (options) => options.isNameNDI === true,
 			},
 		],
 		callback: async (action) => {
+			const nameSource = await self.parseVariablesInString(action.options.nameSource)
+			const nameNDI = await self.parseVariablesInString(action.options.nameNDI)
 			await self.sendCommand(
 				'set-channel',
 				'ndi-name=' +
-					(action.options.isNameNDI || action.options.nameSource === '' ? 'true' : 'false') +
+					(action.options.isNameNDI || nameSource === '' ? 'true' : 'false') +
 					'&name=' +
-					(action.options.isNameNDI ? action.options.nameNDI : action.options.nameSource),
+					(action.options.isNameNDI ? nameNDI : nameSource),
 			)
 		},
 	}
