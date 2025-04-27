@@ -12,6 +12,12 @@ export function setPresets(self) {
 	const colorDarkRed = combineRgb(102, 0, 0)
 	const colorBlack = combineRgb(0, 0, 0)
 
+	const colorMagewellAttention = '#ee9c26'
+	const colorMagewellActive = '#1f8eec'
+	const colorMagewellHighlight = '#edf6fe'
+	const colorMagewellMenu = '#383838'
+	const colorMagewellGrey = '#8d8d8d'
+
 	presets['dashboardSourceConnected'] = {
 		type: 'button',
 		category: 'Dashboard',
@@ -188,7 +194,7 @@ export function setPresets(self) {
 			text: 'Reboot\\n↺',
 			size: '14',
 			color: colorWhite,
-			bgcolor: '#ee9c26',
+			bgcolor: colorMagewellAttention,
 		},
 		options: {
 			relativeDelay: false,
@@ -334,8 +340,8 @@ export function setPresets(self) {
 						name: preset.id,
 					},
 					style: {
-						color: '#edf6fe',
-						bgcolor: '#1f8eec',
+						color: colorMagewellHighlight,
+						bgcolor: colorMagewellActive,
 					},
 				},
 			],
@@ -373,8 +379,8 @@ export function setPresets(self) {
 						index: index,
 					},
 					style: {
-						color: '#edf6fe',
-						bgcolor: '#1f8eec',
+						color: colorMagewellHighlight,
+						bgcolor: colorMagewellActive,
 					},
 				},
 			],
