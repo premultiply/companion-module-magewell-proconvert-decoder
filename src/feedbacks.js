@@ -98,7 +98,7 @@ export function setFeedbacks(self) {
 		},
 	}
 
-	feedbacks.sourceDropFrames = {
+	feedbacks.sourceQosDrop = {
 		type: 'boolean',
 		name: 'Frame drop detected',
 		description: 'Indicate if Decoder is dropping video frames or audio samples',

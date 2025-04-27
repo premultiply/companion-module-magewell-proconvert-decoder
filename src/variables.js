@@ -26,14 +26,15 @@ export function setVariables(self) {
 	variables.push({ variableId: 'sourceUrl', name: 'Source - URL' })
 	variables.push({ variableId: 'sourceUrlType', name: 'Source - Type' }) // Custom variable
 	variables.push({ variableId: 'sourceBufferDuration', name: 'Source - Buffer Duration (ms)' }) // Custom variable
-	variables.push({ variableId: 'sourceBufferBar', name: 'Source - Buffer Usage' }) // Custom variable
+	variables.push({ variableId: 'sourceBufferUsage', name: 'Source - Buffer Usage (%)' }) // Custom variable
+	variables.push({ variableId: 'sourceBufferUsageBar', name: 'Source - Buffer Usage Bar' }) // Custom variable
 	variables.push({ variableId: 'sourceConnected', name: 'Source - Connected' })
 	variables.push({ variableId: 'sourceTallyPreview', name: 'Source - Tally Preview' })
 	variables.push({ variableId: 'sourceTallyProgram', name: 'Source - Tally Program' })
 	variables.push({ variableId: 'sourceAudioDropSamples', name: 'Source - Audio Dropped Samples' })
 	variables.push({ variableId: 'sourceVideoDropFrames', name: 'Source - Video Dropped Frames' })
-	variables.push({ variableId: 'sourceVideoBitRate', name: 'Source - Video Bit Rate (kbps)' })
-	variables.push({ variableId: 'sourceAudioBitRate', name: 'Source - Audio Bit Rate (Kbps)' })
+	variables.push({ variableId: 'sourceVideoBitrate', name: 'Source - Video Bit Rate (kbps)' })
+	variables.push({ variableId: 'sourceAudioBitrate', name: 'Source - Audio Bit Rate (Kbps)' })
 	variables.push({ variableId: 'sourceTotalBitrate', name: 'Source - Total Bit Rate (kbps)' }) // Custom variable
 	variables.push({ variableId: 'sourceAudioJitter', name: 'Source - Audio Jitter (ms)' })
 	variables.push({ variableId: 'sourceVideoJitter', name: 'Source - Video Jitter (ms)' })
@@ -42,16 +43,16 @@ export function setVariables(self) {
 	variables.push({ variableId: 'sourceVideoHeight', name: 'Source - Video Height' })
 	variables.push({ variableId: 'sourceVideoScan', name: 'Source - Video Scan Mode' })
 	variables.push({ variableId: 'sourceVideoScanShort', name: 'Source - Video Scan Mode (Short)' }) // Custom variable
-	variables.push({ variableId: 'sourceVideoFieldRate', name: 'Source - Video Field Rate (FPS)' })
+	variables.push({ variableId: 'sourceVideoFieldrate', name: 'Source - Video Field Rate (FPS)' })
 	variables.push({ variableId: 'sourceAudioNumChannels', name: 'Source - Audio Number of Channels' })
-	variables.push({ variableId: 'sourceAudioSampleRate', name: 'Source - Audio Sample Rate (Hz)' })
+	variables.push({ variableId: 'sourceAudioSamplerate', name: 'Source - Audio Sample Rate (Hz)' })
 	variables.push({ variableId: 'sourceAudioBitCount', name: 'Source - Audio Bit Count' })
 
 	// Video Config
 	variables.push({ variableId: 'configVideoShowTitle', name: 'Video Config - OSD - Show source name & resolution' })
 	variables.push({ variableId: 'configVideoShowTally', name: 'Video Config - OSD - Show tally indicators' })
 	variables.push({ variableId: 'configVideoShowVUMeter', name: 'Video Config - OSD - Show audio meter' })
-	variables.push({ variableId: 'configVideoVUMeterMode', name: 'Video Config - OSD - Audio meter scale' })
+	variables.push({ variableId: 'configVideoVuMeterMode', name: 'Video Config - OSD - Audio meter scale' })
 	variables.push({ variableId: 'configVideoShowCenterCross', name: 'Video Config - OSD - Show center cross' })
 	variables.push({ variableId: 'configVideoFollowInputMode', name: 'Video Config - Resolution - Follow input' })
 	variables.push({ variableId: 'configVideoSafeAreaMode', name: 'Video Config - OSD - Safe area' })
@@ -61,14 +62,14 @@ export function setVariables(self) {
 	variables.push({ variableId: 'configVideoVFlip', name: 'Video Config - Process - Vertical flip' })
 	variables.push({ variableId: 'configVideoSwitchMode', name: 'Video Config - Source - Display after source lost' })
 	variables.push({ variableId: 'configVideoDeinterlaceMode', name: 'Video Config - Process - Deinterlace mode' })
-	variables.push({ variableId: 'configVideoARConvertMode', name: 'Video Config - Process - AR convert' })
+	variables.push({ variableId: 'configVideoArConvertMode', name: 'Video Config - Process - AR convert' })
 	variables.push({ variableId: 'configVideoInAutoColorFmt', name: 'Video Config - Source - Auto color encoding' })
 	variables.push({ variableId: 'configVideoInColorFmt', name: 'Video Config - Source - Color encoding' })
 
 	// Audio Config
 	variables.push({ variableId: 'configAudioCheckPts', name: 'Audio Config - Check audio PTS' })
 	variables.push({ variableId: 'configAudioGain', name: 'Audio Config - Gain (dB)' })
-	variables.push({ variableId: 'configAudioSampleRate', name: 'Audio Config - Sample Rate (Hz)' })
+	variables.push({ variableId: 'configAudioSamplerate', name: 'Audio Config - Sample Rate (Hz)' })
 	variables.push({ variableId: 'configAudioChannels', name: 'Audio Config - Channel count' })
 	variables.push({ variableId: 'configAudioConvertMode', name: 'Audio Config - Convert Mode' })
 
@@ -134,22 +135,22 @@ export function checkVariables(self) {
 		sourceTallyProgram: self.STATUS.summaryInfo.source.tallyProgram,
 		sourceAudioDropSamples: self.STATUS.summaryInfo.source.audioDropSamples,
 		sourceVideoDropFrames: self.STATUS.summaryInfo.source.videoDropFrames,
-		sourceVideoBitRate: self.STATUS.summaryInfo.source.videoBitRate,
-		sourceAudioBitRate: self.STATUS.summaryInfo.source.audioBitRate,
+		sourceVideoBitrate: self.STATUS.summaryInfo.source.videoBitRate,
+		sourceAudioBitrate: self.STATUS.summaryInfo.source.audioBitRate,
 		sourceAudioJitter: self.STATUS.summaryInfo.source.audioJitter,
 		sourceVideoJitter: self.STATUS.summaryInfo.source.videoJitter,
 		sourceVideoWidth: self.STATUS.summaryInfo.source.videoWidth,
 		sourceVideoHeight: self.STATUS.summaryInfo.source.videoHeight,
 		sourceVideoScan: self.STATUS.summaryInfo.source.videoScan,
-		sourceVideoFieldRate: self.STATUS.summaryInfo.source.videoFieldRate,
+		sourceVideoFieldrate: self.STATUS.summaryInfo.source.videoFieldRate,
 		sourceAudioNumChannels: self.STATUS.summaryInfo.source.audioNumChannels,
-		sourceAudioSampleRate: self.STATUS.summaryInfo.source.audioSampleRate,
+		sourceAudioSamplerate: self.STATUS.summaryInfo.source.audioSampleRate,
 		sourceAudioBitCount: self.STATUS.summaryInfo.source.audioBitCount,
 
 		configVideoShowTitle: self.STATUS.videoConfig.showTitle,
 		configVideoShowTally: self.STATUS.videoConfig.showTally,
 		configVideoShowVUMeter: self.STATUS.videoConfig.showVUMeter,
-		configVideoVUMeterMode: self.STATUS.videoConfig.vuMeterMode,
+		configVideoVuMeterMode: self.STATUS.videoConfig.vuMeterMode,
 		configVideoShowCenterCross: self.STATUS.videoConfig.showCenterCross,
 		configVideoFollowInputMode: self.STATUS.videoConfig.followInputMode,
 		configVideoSafeAreaMode: self.STATUS.videoConfig.safeAreaMode,
@@ -159,13 +160,13 @@ export function checkVariables(self) {
 		configVideoVFlip: self.STATUS.videoConfig.vFlip,
 		configVideoSwitchMode: self.STATUS.videoConfig.switchMode,
 		configVideoDeinterlaceMode: self.STATUS.videoConfig.deinterlaceMode,
-		configVideoARConvertMode: self.STATUS.videoConfig.arConvertMode,
+		configVideoArConvertMode: self.STATUS.videoConfig.arConvertMode,
 		configVideoInAutoColorFmt: self.STATUS.videoConfig.inAutoColorFmt,
 		configVideoInColorFmt: self.STATUS.videoConfig.inColorFmt,
 
 		configAudioCheckPts: self.STATUS.audioConfig.checkPts,
 		configAudioGain: self.STATUS.audioConfig.gain,
-		configAudioSampleRate: self.STATUS.audioConfig.sampleRate,
+		configAudioSamplerate: self.STATUS.audioConfig.sampleRate,
 		configAudioChannels: self.STATUS.audioConfig.channels,
 		configAudioConvertMode: self.STATUS.audioConfig.convertMode,
 
@@ -174,7 +175,8 @@ export function checkVariables(self) {
 		sourceVideoScanShort: self.STATUS.summaryInfo.source.videoScan?.charAt(0) ?? ' ',
 
 		sourceBufferDuration: buffer,
-		sourceBufferBar: progressBar(normalizePct(jitter / buffer, 0, 1, true), 15),
+		sourceBufferUsage: normalizePct(jitter / buffer, 0, 1, true),
+		sourceBufferUsageBar: progressBar(normalizePct(jitter / buffer, 0, 1, true), 15),
 
 		sourceTotalBitrate: bitrate,
 		sourceTotalJitter: jitter,

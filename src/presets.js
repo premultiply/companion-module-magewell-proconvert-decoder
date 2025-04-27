@@ -17,7 +17,7 @@ export function setPresets(self) {
 		category: 'Dashboard',
 		name: 'Source Connected',
 		style: {
-			text: '$(generic-module:sourceName)',
+			text: 'SOURCE\\n$(generic-module:sourceName)',
 			size: '14',
 			color: colorWhite,
 			bgcolor: colorBlack,
@@ -34,12 +34,104 @@ export function setPresets(self) {
 		],
 	}
 
+	presets['dashboardQoS'] = {
+		type: 'button',
+		category: 'Dashboard',
+		name: 'QoS Video/Audio Dropped Frames/Samples',
+		style: {
+			text: 'QoS\\n$(generic-module:sourceVideoDropFrames)\\n$(generic-module:sourceAudioDropSamples)',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [],
+		feedbacks: [
+			{
+				feedbackId: 'sourceQosDrop',
+				style: {
+					color: colorWhite,
+					bgcolor: colorRed,
+				},
+			},
+		],
+	}
+
+	presets['dashboardDecoding'] = {
+		type: 'button',
+		category: 'Dashboard',
+		name: 'Decoding Video/Audio Bitrate',
+		style: {
+			text: 'Decoding\\n$(generic-module:sourceVideoBitrate) k\\n$(generic-module:sourceAudioBitrate) k',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [],
+		feedbacks: [],
+	}
+
+	presets['dashboardJitter'] = {
+		type: 'button',
+		category: 'Dashboard',
+		name: 'Jitter Video/Audio',
+		style: {
+			text: 'Jitter\\n$(generic-module:sourceVideoJitter) ms\\n$(generic-module:sourceAudioJitter) ms',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [],
+		feedbacks: [],
+	}
+
+	presets['dashboardJitterBuffer'] = {
+		type: 'button',
+		category: 'Dashboard',
+		name: 'Buffer Usage',
+		style: {
+			text: 'Buffer\\n$(generic-module:sourceBufferDuration) ms\\n$(generic-module:sourceBufferBar)',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [],
+		feedbacks: [],
+	}
+
+	presets['dashboardVideoFmt'] = {
+		type: 'button',
+		category: 'Dashboard',
+		name: 'Video Format',
+		style: {
+			text: 'Video\\n$(generic-module:sourceVideoHeight)$(generic-module:sourceVideoScanShort)\\n$(generic-module:sourceVideoFieldrate) Hz',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [],
+		feedbacks: [],
+	}
+
+	presets['dashboardAudioFmt'] = {
+		type: 'button',
+		category: 'Dashboard',
+		name: 'Audio Format',
+		style: {
+			text: 'Audio\\n$(generic-module:sourceAudioNumChannels)x$(generic-module:sourceAudioBitCount) Bit\\n$(generic-module:sourceAudioSamplerate) Hz',
+			size: '14',
+			color: colorWhite,
+			bgcolor: colorBlack,
+		},
+		steps: [],
+		feedbacks: [],
+	}
+
 	presets['dashboardTallyProgram'] = {
 		type: 'button',
 		category: 'Dashboard',
 		name: 'Tally Program',
 		style: {
-			text: 'TALLY\\nProgram',
+			text: '⚪ TALLY\\nProgram',
 			size: '14',
 			color: colorWhite,
 			bgcolor: colorBlack,
@@ -66,7 +158,7 @@ export function setPresets(self) {
 		category: 'Dashboard',
 		name: 'Tally Preview',
 		style: {
-			text: 'TALLY\\nPreview',
+			text: '⚪ TALLY\\nPreview',
 			size: '14',
 			color: colorWhite,
 			bgcolor: colorBlack,
@@ -93,10 +185,10 @@ export function setPresets(self) {
 		category: 'System',
 		name: 'Reboot Device (Hold for 2s)',
 		style: {
-			text: 'Reboot',
+			text: 'Reboot\\n↺',
 			size: '14',
 			color: colorWhite,
-			bgcolor: colorBlack,
+			bgcolor: '#ee9c26',
 		},
 		options: {
 			relativeDelay: false,
@@ -145,7 +237,7 @@ export function setPresets(self) {
 						},
 					},
 					{
-						actionId: 'videoConfigAutoColorFormat',
+						actionId: 'videoConfigAutoColorFmt',
 						options: {
 							auto: true,
 						},
@@ -215,15 +307,12 @@ export function setPresets(self) {
 		presets[`presetName${index}`] = {
 			type: 'button',
 			category: 'Source Presets by Name',
-			name: `Select Source Preset "${preset.id}"`,
+			name: `Select SOURCE "${preset.id}"`,
 			style: {
-				text: preset.id,
-				size: '14',
-				color: colorWhite,
-				bgcolor: colorBlack,
-			},
-			options: {
-				relativeDelay: false,
+				text: `SELECT\\nSOURCE PRESET\\n\\n${preset.id}`,
+				size: '7',
+				color: colorBlack,
+				bgcolor: colorWhite,
 			},
 			steps: [
 				{
@@ -245,8 +334,8 @@ export function setPresets(self) {
 						name: preset.id,
 					},
 					style: {
-						color: colorWhite,
-						bgcolor: colorBlue,
+						color: '#edf6fe',
+						bgcolor: '#1f8eec',
 					},
 				},
 			],
@@ -259,13 +348,10 @@ export function setPresets(self) {
 			category: 'Source Presets by Index',
 			name: `Select Source Preset #${index}`,
 			style: {
-				text: `PRESET #${index}\\n\\n$(generic-module:presetSource${index})`,
+				text: `SELECT\\nSOURCE PRESET\\nINDEX #${index}\\n\\n$(generic-module:presetSource${index})`,
 				size: '7',
-				color: colorWhite,
-				bgcolor: colorBlack,
-			},
-			options: {
-				relativeDelay: false,
+				color: colorBlack,
+				bgcolor: colorWhite,
 			},
 			steps: [
 				{
@@ -287,8 +373,8 @@ export function setPresets(self) {
 						index: index,
 					},
 					style: {
-						color: colorWhite,
-						bgcolor: colorBlue,
+						color: '#edf6fe',
+						bgcolor: '#1f8eec',
 					},
 				},
 			],
